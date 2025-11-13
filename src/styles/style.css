@@ -1,0 +1,319 @@
+:root{
+  --bg:#000; --text:#fff; --muted:#d3d3d3;
+  --accent:#1E90FF; --neon:#39FF14;
+}
+html,body{background:var(--bg); color:var(--text); font-family:'Roboto',system-ui,-apple-system,Segoe UI,Arial;}
+a{color:var(--accent)} a:hover{color:#66b8ff}
+.text-neon{color:var(--neon)}
+.navbar .brand-title{font-family:'Orbitron', sans-serif; letter-spacing:.5px}
+.section-title{font-family:'Orbitron', sans-serif; font-weight:800}
+.title-glow{text-shadow:0 0 10px rgba(57,255,20,.6), 0 0 20px rgba(30,144,255,.5)}
+.border-neon{border-color:rgba(57,255,20,.4)!important}
+.info-card{background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08);}
+.card{background: rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1);}
+
+.btn-neon{
+  background: linear-gradient(90deg, var(--neon), var(--accent));
+  border:0; color:#000; font-weight:700;
+  box-shadow:0 0 12px rgba(57,255,20,.4), 0 0 16px rgba(30,144,255,.3);
+}
+.btn-neon:hover{filter:brightness(1.1)}
+.btn-outline-neon{
+  border:2px solid var(--neon); color:var(--text); background:transparent;
+  box-shadow:0 0 8px rgba(57,255,20,.3);
+}
+.btn-outline-neon:hover{background: rgba(57,255,20,.15)}
+
+.hero{background: radial-gradient(1200px 400px at 50% -20%, rgba(30,144,255,.2), transparent),
+                 radial-gradient(1200px 400px at 50% 120%, rgba(57,255,20,.2), transparent);}
+
+.form-control,.form-select,.form-range{background:#0b0b0b; color:var(--text); border:1px solid rgba(255,255,255,.15)}
+.form-control:focus,.form-select:focus{border-color: var(--accent); box-shadow: 0 0 0 .25rem rgba(30,144,255,.25)}
+.card .price{color:var(--neon); font-weight:700}
+
+.whatsapp-float{
+  position:fixed; right:18px; bottom:18px; display:inline-flex; justify-content:center; align-items:center;
+  width:56px; height:56px; border-radius:50%; background:#25D366; color:white; font-size:28px;
+  box-shadow:0 6px 18px rgba(0,0,0,.4); z-index:1000;
+}
+
+/* Tema claro para accesibilidad */
+:root[data-theme='light']{ --bg:#010810; --text:#caa3a3; --muted:#333; }
+:root[data-theme='light'] .info-card, :root[data-theme='light'] .card{background:#fff;border-color:#e5e7eb}
+:root[data-theme='light'] .navbar{background:#111!important}
+
+/* Carrusel compacto */
+.carousel--compact .carousel-item img{
+  width: 100%;
+  height: 420px;      /* 👈 altura principal del carrusel en pantallas medianas+ */
+  object-fit: cover;  /* recorta sin deformar la imagen */
+  object-position: center;
+  display: block;
+}
+
+/* En celulares lo hacemos un poco más bajo */
+@media (max-width: 576px){
+  .carousel--compact .carousel-item img{
+    height: 280px;    /* 👈 ajusta si quieres aún más bajo en móvil */
+  }
+}
+
+/* En pantallas grandes puedes subir un poquito si te gusta */
+@media (min-width: 1200px){
+  .carousel--compact .carousel-item img{
+    height: 480px;    /* 👈 opcional: más alto en desktop grande */
+  }
+}
+
+/* Carrusel compacto (controla altura sin deformar) */
+.carousel--compact .carousel-item img{
+  width: 100%;
+  height: 420px;      /* cambia aquí si lo quieres más bajo/alto */
+  object-fit: cover;  /* recorta sin deformar */
+  object-position: center;
+  display: block;
+}
+
+/* Más bajo en móvil */
+@media (max-width: 576px){
+  .carousel--compact .carousel-item img{ height: 280px; }
+}
+
+/* Ligeramente más alto en desktop grande */
+@media (min-width: 1200px){
+  .carousel--compact .carousel-item img{ height: 480px; }
+}
+
+/* Carrusel adaptable con aspect-ratio */
+.carousel--compact .carousel-item img {
+  width: 100%;
+  aspect-ratio: 16 / 9;   /* 👈 relación de aspecto fija */
+  object-fit: cover;      /* recorta sin deformar */
+  object-position: center;
+  display: block;
+}
+
+/* Estilo general del texto en el carrusel */
+.carousel-caption h5 {
+  color: #1effa1;     /* Azul eléctrico */
+  font-size: 3rem;    /* 👈 tamaño del título (ej: 2rem = ~32px) */
+  font-weight: 700;   /* negrita */
+  text-shadow: 0 0 10px rgba(247, 245, 245, 0.8);
+}
+
+.carousel-caption p {
+  color: #D3D3D3;     /* Gris claro */
+  font-size: 1.2rem;  /* 👈 tamaño del párrafo (ej: 1.2rem = ~19px) */
+  font-weight: 400;   /* normal */
+  text-shadow: 0 0 6px rgba(0,0,0,0.7);
+}
+.carousel-caption {
+  background: rgba(0, 0, 0, 0.4); /* Fondo semitransparente */
+  padding: 1rem;                 /* Espaciado interno */
+  border-radius: 8px;            /* Bordes redondeados */
+}
+
+
+
+/* VIDEO DE FONDO LOGIN */
+#bgVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;   /* recorta sin deformar */
+  z-index: -1;         /* detrás de todo */
+}
+
+/* Capa oscura encima del video para legibilidad */
+body[data-page="login"]::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 0;
+}
+
+#bgVideo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* recorta sin deformar */
+  z-index: -1;
+}
+
+body[data-page="login"]::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6); /* capa oscura */
+  z-index: 0;
+}
+
+/* VIDEO DE FONDO LOGIN */
+#bg-video{
+  position: fixed;
+  inset: 0;          /* top, right, bottom, left = 0 */
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* llena sin deformar */
+  z-index: 0;        /* detrás del overlay y contenido, pero visible */
+}
+
+/* Capa oscura encima del video para legibilidad */
+body[data-page="login"]::before{
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5); /* ajusta opacidad si lo ves muy oscuro */
+  z-index: 1;
+}
+/* Asegura que el contenido esté encima del video y overlay */
+body[data-page="login"] > *{
+  position: relative;
+  z-index: 2;
+}
+
+:root {
+  --bg:#000; 
+  --text:#fff; 
+  --neon:#39FF14; 
+  --card:#0f0f0f; 
+  --border:rgba(57,255,20,.35);
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Roboto', system-ui;
+}
+
+/* Forzar texto blanco */
+body, p, h1, h2, h3, h4, h5, h6, small, a, span, li, label, button,
+.navbar, .nav-link, .card-title, .card-text, .brand-title,
+.link-light, .text-muted, .text-secondary {
+  color: #fff !important;
+}
+
+/* Navbar */
+.navbar { background:#000 !important; }
+.brand-title { font-family:'Orbitron', system-ui; letter-spacing:.5px; }
+
+/* Secciones */
+.section-title {
+  font-family:'Orbitron';
+  border-left:4px solid var(--neon);
+  padding-left:.6rem;
+}
+
+/* Cards */
+.card {
+  background: var(--card);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: .75rem;
+  overflow: hidden;
+}
+.card img { object-fit: cover; aspect-ratio:16/9; }
+.card:hover {
+  border-color: var(--neon);
+  transform: translateY(-2px);
+  transition: .2s ease;
+}
+
+/* Badges */
+.badge-tag {
+  border:1px solid var(--neon);
+  color:#fff;
+  background:transparent;
+  font-weight:500;
+}
+
+/* Botón estilo neón */
+.btn-outline-neon {
+  color:#fff;
+  border:1px solid var(--neon);
+}
+.btn-outline-neon:hover {
+  background:var(--neon);
+  color:#fff;
+}
+
+/* Bordes globales */
+.border-neon, .navbar.border-bottom, footer.border-top {
+  border-color:var(--border)!important;
+}
+
+/* Placeholders en blanco */
+::placeholder {
+  color: #fff !important;
+  opacity: 0.6;   /* 👈 si quieres más tenue, sube/baja este valor */
+}
+
+.form-control::placeholder {
+  color: #fff !important;
+  opacity: 0.7;
+}
+.form-select { color: #fff; }
+.form-control, .form-select {
+  background: #0b0b0b;
+  border: 1px solid rgba(255,255,255,.15);
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 0 .25rem rgba(57,255,20,.25);
+}
+
+/* ===== Registro: inputs legibles en fondo negro ===== */
+body[data-page="registro"] .form-label,
+body[data-page="registro"] .form-text {
+  color: #fff !important;
+}
+
+body[data-page="registro"] .form-control {
+  background-color: #0b0b0b !important;   /* fondo oscuro */
+  color: #fff !important;                  /* texto blanco */
+  border: 1px solid rgba(255,255,255,.18) !important;
+  caret-color: #39FF14;                    /* cursor visible estilo neón */
+}
+
+body[data-page="registro"] .form-control:focus {
+  border-color: #39FF14 !important;
+  box-shadow: 0 0 0 .25rem rgba(57,255,20,.25) !important;
+}
+
+/* Placeholders visibles sobre fondo negro */
+body[data-page="registro"] ::placeholder {
+  color: rgba(255,255,255,.70) !important;
+}
+
+/* Fix de AUTOFILL (Chrome/Edge) para que no ponga fondo claro con texto blanco */
+body[data-page="registro"] input:-webkit-autofill,
+body[data-page="registro"] input:-webkit-autofill:hover,
+body[data-page="registro"] input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px #0b0b0b inset !important;
+  -webkit-text-fill-color: #fff !important;
+  caret-color: #39FF14;
+  transition: background-color 9999s ease-out 0s; /* truco para mantener el fondo */
+}
+
+/* ===== Soporte: campos blancos legibles sobre fondo negro ===== */
+body[data-page="soporte"] .form-control--light {
+  background: #fff !important;
+  color: #000 !important;
+  border: 1px solid rgba(255,255,255,.2) !important;
+}
+
+body[data-page="soporte"] .form-control--light::placeholder {
+  color: #555 !important;
+  opacity: 1 !important;
+}
