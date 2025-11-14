@@ -26,8 +26,8 @@ export default function ProductosList() {
               id={p.id}
               title={p.nombre}
               price={p.precio}
-              imgUrl={p.imagen ? `/${p.imagen}` : ""}
-              tag="Juego"
+              imgUrl={p.imagen}   
+              tag={p.descripcion}
             />
           ))}
         </div>

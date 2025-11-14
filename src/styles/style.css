@@ -317,3 +317,31 @@ body[data-page="soporte"] .form-control--light::placeholder {
   color: #555 !important;
   opacity: 1 !important;
 }
+
+/* ==== EFECTO HOVER EN TARJETAS DE PRODUCTO ==== */
+
+.info-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+}
+
+.info-card:hover {
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 0 15px #00ff88;
+  border-color: #00ff88;
+}
+
+.info-card img {
+  transition: transform 0.4s ease, filter 0.3s ease;
+}
+
+.info-card:hover img {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+/* Opcional: efecto neon para el texto */
+.text-neon {
+  color: #00ff88;
+  text-shadow: 0 0 5px #00ff88, 0 0 10px #00ff88;
+}
