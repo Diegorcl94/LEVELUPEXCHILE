@@ -1,10 +1,6 @@
 package com.levelup.levelupbackend.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "productos")
@@ -15,11 +11,18 @@ public class Producto {
     private Long id;
 
     private String nombre;
+
+    @Column(columnDefinition = "TEXT")
     private String descripcion;
+
     private double precio;
+
+    private String categoria;
+
     private String imagen;
 
-    // Getters y Setters
+    public Producto() {}
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -31,6 +34,9 @@ public class Producto {
 
     public double getPrecio() { return precio; }
     public void setPrecio(double precio) { this.precio = precio; }
+
+    public String getCategoria() { return categoria; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
 
     public String getImagen() { return imagen; }
     public void setImagen(String imagen) { this.imagen = imagen; }

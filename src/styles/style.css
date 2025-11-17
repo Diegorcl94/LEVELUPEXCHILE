@@ -345,3 +345,12 @@ body[data-page="soporte"] .form-control--light::placeholder {
   color: #00ff88;
   text-shadow: 0 0 5px #00ff88, 0 0 10px #00ff88;
 }
+
+.badge {
+  background: #39ff14 !important;
+  color: black !important;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+

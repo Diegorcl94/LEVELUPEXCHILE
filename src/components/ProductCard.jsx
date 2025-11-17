@@ -1,31 +1,22 @@
 import { useState } from "react";
-import placeholder from "../assets/img/videojuego.jpg"; 
+import placeholder from "../assets/img/videojuego.jpg";
 
-export default function ProductCard({ id, title, price, imgUrl, tag }) {
+export default function ProductCard({ id, nombre, precio, imagen, descripcion, categoria }) {
   const [added, setAdded] = useState(false);
 
-  // ========================
-  // Detectar URL o imagen local
-  // ========================
   let imagePath = placeholder;
 
-  if (imgUrl) {
-    // Caso 1: URL externa
-    if (imgUrl.startsWith("http://") || imgUrl.startsWith("https://")) {
-      imagePath = imgUrl;
-    } 
-    // Caso 2: Imagen local desde public/img
-    else {
-      imagePath = `/img/${imgUrl}`;
+  if (imagen) {
+    if (imagen.startsWith("http://") || imagen.startsWith("https://")) {
+      imagePath = imagen;
+    } else {
+      imagePath = `/img/${imagen}`;
     }
   }
 
-  // ========================
-  // Botón agregar al carrito
-  // ========================
   function handleAdd() {
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    setTimeout(() => setAdded(false), 1500);
   }
 
   return (
@@ -34,26 +25,27 @@ export default function ProductCard({ id, title, price, imgUrl, tag }) {
 
         <img
           src={imagePath}
-          alt={title}
+          alt={nombre}
           className="img-fluid rounded-3 mb-2"
-          style={{
-            maxHeight: "230px",
-            objectFit: "cover",
-            border: "1px solid #198754",
-          }}
-          onError={(e) => (e.target.src = placeholder)}
+          style={{ maxHeight: "230px", objectFit: "cover", border: "1px solid #198754" }}
         />
 
-        <div className="small text-secondary">{tag}</div>
-        <strong className="d-block">{title}</strong>
+        {/* CATEGORÍA */}
+        {categoria && (
+          <div className="badge bg-success text-dark fw-bold mb-1" style={{ width: "fit-content" }}>
+            {categoria.toUpperCase()}
+          </div>
+        )}
+
+        <div className="small text-secondary">{descripcion}</div>
+
+        <strong className="d-block">{nombre}</strong>
+
         <span className="text-neon d-block mb-2">
-          ${price?.toLocaleString("es-CL")}
+          ${precio?.toLocaleString("es-CL")}
         </span>
 
-        <button
-          className="btn btn-sm btn-success w-100 mt-auto"
-          onClick={handleAdd}
-        >
+        <button className="btn btn-success w-100 mt-auto" onClick={handleAdd}>
           Agregar al carrito
         </button>
 

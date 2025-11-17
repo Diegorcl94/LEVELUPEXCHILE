@@ -1,28 +1,63 @@
-export default function Login(){ return(
-    <main>
-        <main className="d-flex align-items-center justify-content-center min-vh-100">
-    <div className="container">
-      <form id="loginForm" className="info-card p-4 rounded-4 needs-validation" novalidate>
-        <h1 className="section-title mb-4 text-center">Iniciar Sesión</h1>
+import { useState } from "react";
 
-        <div className="mb-3">
-          <label className="form-label">Correo</label>
-          <input type="email" id="email" className="form-control form-control-lg" required></input>
-          <div className="invalid-feedback">Ingresa un correo válido.</div>
-        </div>
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-        <div className="mb-3">
-          <label className="form-label">Contraseña</label>
-          <input type="password" id="password" className="form-control form-control-lg" minlength="6" required></input>
-          <div className="invalid-feedback">Mínimo 6 caracteres.</div>
-        </div>
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
 
-        <div className="d-grid gap-2">
-          <button className="btn btn-neon btn-lg" type="submit">Entrar</button>
-          <a className="btn btn-outline-neon" href="/registro">Crear cuenta</a>
-        </div>
+    try {
+      const res = await fetch("http://localhost:8080/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        setError("Credenciales incorrectas");
+        return;
+      }
+
+      const data = await res.json();
+
+      // Guardar token y usuario
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.usuario));
+
+      window.location.href = "/perfil";
+    } catch (err) {
+      setError("Error de conexión con el servidor");
+    }
+  };
+
+  return (
+    <main className="container py-5">
+      <h1 className="section-title mb-4">Iniciar sesión</h1>
+
+      <form className="info-card p-4 rounded-4" onSubmit={handleLogin}>
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        <label className="form-label">Correo</label>
+        <input className="form-control"
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+        />
+
+        <label className="form-label mt-3">Contraseña</label>
+        <input className="form-control"
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+        />
+
+        <button className="btn btn-neon mt-4 w-100">
+          Iniciar sesión
+        </button>
       </form>
-    </div>
-  </main>
     </main>
-) }
+  );
+}
