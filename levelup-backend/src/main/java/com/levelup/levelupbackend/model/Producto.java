@@ -1,6 +1,11 @@
 package com.levelup.levelupbackend.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "productos")
@@ -10,19 +15,24 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String nombre;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, length = 500)
     private String descripcion;
 
-    private double precio;
-
-    private String categoria;
-
+    @Column(nullable = false)
     private String imagen;
+
+    @Column(nullable = false)
+    private Integer precio;
+
+    @Column(nullable = false)
+    private String categoria;
 
     public Producto() {}
 
+    // GETTERS Y SETTERS
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -32,12 +42,12 @@ public class Producto {
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public double getPrecio() { return precio; }
-    public void setPrecio(double precio) { this.precio = precio; }
+    public String getImagen() { return imagen; }
+    public void setImagen(String imagen) { this.imagen = imagen; }
+
+    public Integer getPrecio() { return precio; }
+    public void setPrecio(Integer precio) { this.precio = precio; }
 
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
-
-    public String getImagen() { return imagen; }
-    public void setImagen(String imagen) { this.imagen = imagen; }
 }

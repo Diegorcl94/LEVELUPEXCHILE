@@ -10,8 +10,16 @@ export default function ProductosList() {
   const [precioMax, setPrecioMax] = useState("");
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    const config = {
+      headers: {},
+    };
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
+
     axios
-      .get("http://localhost:8080/api/productos")
+      .get("http://localhost:8080/productos/listar", config)
       .then((response) => setProductos(response.data))
       .catch((error) => console.error("Error al obtener productos:", error));
   }, []);

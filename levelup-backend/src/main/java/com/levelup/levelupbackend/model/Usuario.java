@@ -15,21 +15,28 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String nombre;
+
+    @Column(nullable = false)
     private String apellido;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false, length = 150)
     private String password;
+
     private String sexo;
     private String domicilio;
     private String fotoPerfil;
 
+    @Column(nullable = false)
     private String rol;
 
     public Usuario() {}
 
+    // GETTERS Y SETTERS
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

@@ -1,10 +1,14 @@
 package com.levelup.levelupbackend.repository;
 
-import com.levelup.levelupbackend.model.Usuario;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.Optional;
+import com.levelup.levelupbackend.model.Usuario;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByEmail(String email);
+    boolean existsByEmail(String email);
+   
+
 }
