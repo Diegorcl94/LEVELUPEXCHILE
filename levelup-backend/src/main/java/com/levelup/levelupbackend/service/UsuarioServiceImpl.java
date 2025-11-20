@@ -19,36 +19,23 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario registrar(Usuario usuario) {
+        usuario.setEmail(usuario.getEmail().trim().toLowerCase());
 
-        // Normalizar email
-        if (usuario.getEmail() != null) {
-            usuario.setEmail(usuario.getEmail().trim().toLowerCase());
-        }
-
-        // Validación de existencia
         if (usuarioRepository.existsByEmail(usuario.getEmail())) {
             throw new IllegalArgumentException("El email ya existe");
         }
 
-        // Rol por defecto
         if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
             usuario.setRol("USER");
         }
 
-        // Encriptar password
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
 
-        try {
-            return usuarioRepository.save(usuario);
-        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
-            throw new IllegalArgumentException("El email ya existe");
-        }
+        return usuarioRepository.save(usuario);
     }
 
     @Override
     public Usuario login(String email, String password) {
-
-        // Normalizar email también aquí
         email = email.trim().toLowerCase();
 
         Usuario u = usuarioRepository.findByEmail(email)
@@ -63,8 +50,47 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     @Override
     public Usuario obtenerPorEmail(String email) {
-
         return usuarioRepository.findByEmail(email.toLowerCase())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    }
+
+    @Override
+    public Usuario actualizarDatos(String email, Usuario datos) {
+
+        Usuario u = obtenerPorEmail(email);
+
+        u.setNombre(datos.getNombre());
+        u.setApellido(datos.getApellido());
+        u.setSexo(datos.getSexo());
+        u.setDomicilio(datos.getDomicilio());
+        u.setFotoPerfil(datos.getFotoPerfil());
+
+        return usuarioRepository.save(u);
+    }
+
+    @Override
+    public void cambiarPassword(String email, String actual, String nueva) {
+
+        Usuario u = obtenerPorEmail(email);
+
+        if (!passwordEncoder.matches(actual, u.getPassword())) {
+            throw new RuntimeException("La contraseña actual no es correcta");
+        }
+
+        u.setPassword(passwordEncoder.encode(nueva));
+        usuarioRepository.save(u);
+    }
+
+    @Override
+    public void resetPassword(String email, String nuevaPassword) {
+        Usuario u = obtenerPorEmail(email);
+
+        u.setPassword(passwordEncoder.encode(nuevaPassword));
+        usuarioRepository.save(u);
+    }
+
+    @Override
+    public void eliminar(String email) {
+        usuarioRepository.deleteByEmail(email.toLowerCase());
     }
 }

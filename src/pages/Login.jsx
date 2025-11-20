@@ -1,37 +1,47 @@
 import { useState } from "react";
+import { apiPost } from "../utils/api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = async (e) => {
+  async function handleLogin(e) {
     e.preventDefault();
     setError("");
 
     try {
-      const res = await fetch("http://localhost:8080/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const data = await apiPost("/auth/login", {
+        email,
+        password,
       });
 
-      if (!res.ok) {
-        setError("Credenciales incorrectas");
-        return;
+      // ================================
+      // GUARDAR SESIÓN DE FORMA SEGURA
+      // ================================
+      localStorage.setItem("token", String(data.token)); // 🔥 FIX TOKEN
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          email: data.email,
+          rol: data.rol,
+        })
+      );
+
+      // ================================
+      // REDIRECCIÓN SEGÚN ROL
+      // ================================
+      if (data.rol === "ADMIN") {
+        window.location.href = "/admin-panel";
+      } else {
+        window.location.href = "/perfil";
       }
 
-      const data = await res.json();
-
-      // Guardar token y usuario
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.usuario));
-
-      window.location.href = "/perfil";
     } catch (err) {
-      setError("Error de conexión con el servidor");
+      console.error("Error login:", err);
+      setError("Credenciales incorrectas o servidor no disponible");
     }
-  };
+  }
 
   return (
     <main className="container py-5">
@@ -41,22 +51,34 @@ export default function Login() {
         {error && <div className="alert alert-danger">{error}</div>}
 
         <label className="form-label">Correo</label>
-        <input className="form-control"
+        <input
+          className="form-control"
           type="email"
+          required
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
 
         <label className="form-label mt-3">Contraseña</label>
-        <input className="form-control"
+        <input
+          className="form-control"
           type="password"
+          required
           value={password}
-          onChange={e => setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
         />
 
-        <button className="btn btn-neon mt-4 w-100">
-          Iniciar sesión
-        </button>
+        <button className="btn btn-neon mt-4 w-100">Iniciar sesión</button>
+
+        <div className="mt-3 text-center">
+          <a href="/registro" className="text-neon">
+            ¿No tienes cuenta? Regístrate aquí
+          </a>
+          <br />
+          <a href="/recuperar" className="text-warning">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
       </form>
     </main>
   );

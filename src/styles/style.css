@@ -354,3 +354,124 @@ body[data-page="soporte"] .form-control--light::placeholder {
   font-weight: bold;
 }
 
+/* ---- TARJETAS ADMIN ---- */
+.admin-card {
+  display: block;
+  background: #1b1b1b;
+  padding: 25px;
+  border-radius: 18px;
+  text-decoration: none;
+  color: white;
+  text-align: center;
+  transition: 0.25s ease-in-out;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.admin-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 18px rgba(0,255,150,0.4);
+}
+
+.admin-card .icon {
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+.shadow-neon-green:hover { box-shadow: 0 0 18px rgba(0,255,100,0.7); }
+.shadow-neon-blue:hover { box-shadow: 0 0 18px rgb(0,150,255); }
+.shadow-neon-purple:hover { box-shadow: 0 0 18px rgb(170,0,255); }
+.shadow-neon-orange:hover { box-shadow: 0 0 18px rgb(255,120,0); }
+.shadow-neon-red:hover   { box-shadow: 0 0 18px rgb(255,0,0); }
+
+.info-card {
+  background: #1a1a1a;
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: 0 0 12px rgba(0,255,160,0.15);
+}
+
+.modal-compra {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s;
+  z-index: 9999;
+}
+
+.modal-content-neon {
+  background: #111;
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  border: 1px solid #00ffbf;
+  box-shadow: 0 0 25px rgba(0,255,190,0.5);
+  animation: popIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes popIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.compra-card {
+  background: #111;
+  border: 1px solid rgba(0,255,190,0.4);
+  box-shadow: 0 0 15px rgba(0,255,190,0.25);
+  transition: 0.2s;
+}
+
+.compra-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 30px rgba(0,255,190,0.5);
+}
+
+.neon-border {
+  border-radius: 15px;
+}
+
+/* TABLA ESTILO DASHBOARD NEÓN */
+.table-admin {
+  border-radius: 15px;
+  overflow: hidden;
+  background: #0f0f0f;
+}
+
+.table-header-neon {
+  background: rgba(0, 255, 190, 0.2);
+  border-bottom: 2px solid #00ff1ead;
+  text-shadow: 0 0 8px #00ffbf;
+}
+
+.fila-neon-hover:hover {
+  background: rgba(0, 255, 190, 0.08) !important;
+  box-shadow: 0 0 12px rgba(0, 255, 190, 0.4);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-neon {
+  background: #00ffbf;
+  color: black;
+  border: none;
+  font-weight: bold;
+  box-shadow: 0 0 12px #00ffbf;
+  transition: 0.2s;
+}
+
+.btn-neon:hover {
+  box-shadow: 0 0 22px #00ffbf;
+  transform: translateY(-2px);
+}
+

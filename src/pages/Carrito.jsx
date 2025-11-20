@@ -1,89 +1,99 @@
-import { useState, useMemo } from "react";
-import { calcularSubtotal, calcularDescuento, calcularTotal } from "../utils/cart.js";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-export default function Carrito(){ 
-  
-  const [items, setItems] = useState([
-    { id: 1, title: "Dragon Ball: Sparking Zero", price: 59990, qty: 1 },
-    { id: 2, title: "Zelda: Tears of the Kingdom", price: 49990, qty: 2 }
-  ]);
+export default function Carrito() {
+  const [carrito, setCarrito] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const [esDuoc, setEsDuoc] = useState(true);
+  useEffect(() => {
+    const data = JSON.parse(localStorage.getItem("carrito")) || [];
+    setCarrito(data);
 
-  // useMemo para evitar cálculos innecesarios en cada render 
-  const subtotal = useMemo(() => calcularSubtotal(items), [items]);
-  const descuento = useMemo(() => calcularDescuento(subtotal, esDuoc), [subtotal, esDuoc]);
-  const total = useMemo(() => calcularTotal(items, esDuoc), [items, esDuoc]);
+    const suma = data.reduce((acc, item) => acc + item.precio, 0);
+    setTotal(suma);
+  }, []);
 
-  function cambiarCantidad(id, nuevaCantidad) {
-    setItems(prev =>
-      prev.map(it =>
-        it.id === id ? { ...it, qty: nuevaCantidad } : it
-      )
-    );
+  const eliminarItem = (id) => {
+    const nuevo = carrito.filter((p) => p.id !== id);
+    localStorage.setItem("carrito", JSON.stringify(nuevo));
+    setCarrito(nuevo);
+
+    const suma = nuevo.reduce((acc, item) => acc + item.precio, 0);
+    setTotal(suma);
+  };
+
+  async function finalizarCompra() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (!user) {
+      alert("Debes iniciar sesión para comprar.");
+      return;
+    }
+
+    const compra = {
+      usuarioEmail: user.email,
+      productos: JSON.stringify(carrito),
+      total: total
+    };
+
+    try {
+      await axios.post("http://localhost:8080/compras/guardar", compra);
+      setModalVisible(true); // MOSTRAR MODAL ANIMADO
+
+      // limpiar carrito
+      localStorage.setItem("carrito", JSON.stringify([]));
+      setCarrito([]);
+      setTotal(0);
+
+    } catch (e) {
+      alert("Error al procesar la compra");
+    }
   }
-  
+
   return (
+    <div className="container py-5">
+      <h1 className="section-title">Carrito de Compras 🛒</h1>
 
-    <main className="container py-4">
-      <h1 className="section-title mb-3">Tu Carrito</h1>
-
-      <div className="row g-3">
-        {items.map(it => (
-          <div key={it.id} className="col-12">
-            <div className="p-3 rounded-4 bg-dark text-light d-flex justify-content-between align-items-center">
+      {carrito.length === 0 ? (
+        <p className="text-light mt-4">Tu carrito está vacío.</p>
+      ) : (
+        <>
+          {carrito.map((item) => (
+            <div key={item.id} className="info-card p-3 mb-3 rounded-4 text-light d-flex justify-content-between">
               <div>
-                <strong>{it.title}</strong><br />
-                <small>${it.price.toLocaleString("es-CL")} c/u</small>
+                <strong>{item.nombre}</strong>
+                <p>${item.precio.toLocaleString("es-CL")}</p>
               </div>
-
-              <div className="d-flex align-items-center gap-2">
-                <input
-                  type="number"
-                  min={1}
-                  className="form-control form-control-sm"
-                  style={{width: "70px"}}
-                  value={it.qty}
-                  onChange={e => cambiarCantidad(it.id, Number(e.target.value))}
-                />
-                <span className="fw-bold">
-                  ${(it.price * it.qty).toLocaleString("es-CL")}
-                </span>
-              </div>
+              <button className="btn btn-danger" onClick={() => eliminarItem(item.id)}>X</button>
             </div>
+          ))}
+
+          <h3 className="text-neon mt-4">Total: ${total.toLocaleString("es-CL")}</h3>
+
+          <button className="btn btn-neon w-100 mt-3" onClick={finalizarCompra}>
+            Finalizar compra 💳
+          </button>
+        </>
+      )}
+
+      {/* ========================== */}
+      {/* MODAL NEÓN DE COMPRA EXITOSA */}
+      {/* ========================== */}
+      {modalVisible && (
+        <div className="modal-compra show" onClick={() => setModalVisible(false)}>
+          <div className="modal-content-neon" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-neon">¡Compra exitosa! 🎉</h2>
+            <p className="text-light mt-3">
+              Gracias por tu compra en <strong>LevelUp</strong>.  
+              Revisa tu historial en tu perfil.
+            </p>
+
+            <button className="btn btn-success w-100 mt-3" onClick={() => setModalVisible(false)}>
+              Cerrar
+            </button>
           </div>
-        ))}
-      </div>
-
-      <hr className="my-4" />
-
-      <div className="bg-secondary text-light rounded-4 p-3">
-        <p className="mb-1 d-flex justify-content-between">
-          <span>Subtotal:</span>
-          <span>${subtotal.toLocaleString("es-CL")}</span>
-        </p>
-        <p className="mb-1 d-flex justify-content-between">
-          <span>Descuento DUOC:</span>
-          <span>- ${descuento.toLocaleString("es-CL")}</span>
-        </p>
-        <p className="fs-5 fw-bold d-flex justify-content-between">
-          <span>Total a pagar:</span>
-          <span>${total.toLocaleString("es-CL")}</span>
-        </p>
-
-        <div className="form-check mt-3">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            id="duocCheck"
-            checked={esDuoc}
-            onChange={e => setEsDuoc(e.target.checked)}
-          />
-          <label className="form-check-label" htmlFor="duocCheck">
-            Soy estudiante DUOC (20% OFF)
-          </label>
         </div>
-      </div>
-    </main>
-); 
+      )}
+    </div>
+  );
 }

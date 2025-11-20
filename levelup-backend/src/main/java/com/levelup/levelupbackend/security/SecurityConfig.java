@@ -28,11 +28,17 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    // =======================
+    //  PASSWORD ENCODER
+    // =======================
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // =======================
+    //  AUTHPROVIDER
+    // =======================
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -41,48 +47,60 @@ public class SecurityConfig {
         return provider;
     }
 
+    // =======================
+    //  AUTH MANAGER
+    // =======================
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    // =======================
+    //  SECURITY CHAIN
+    // =======================
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> {})  // CORS habilitado
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> {})
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                        // LIBRE: registro, login
-                        .requestMatchers("/auth/**").permitAll()
+            .authorizeHttpRequests(auth -> auth
+                
+                // LIBRES
+                .requestMatchers("/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password").permitAll()
 
-                        // LIBRE: swagger
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
+                .requestMatchers(
+                        "/v3/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                ).permitAll()
+                .requestMatchers("/productos/listar").permitAll()
 
-                        // LIBRE: obtener lista de productos
-                        .requestMatchers("/productos/listar").permitAll()
+                // CRUD de productos → SOLO ADMIN
+                .requestMatchers("/productos/crear").hasRole("ADMIN")
+                .requestMatchers("/productos/editar/**").hasRole("ADMIN")
+                .requestMatchers("/productos/eliminar/**").hasRole("ADMIN")
 
-                        // SOLO ADMIN: CRUD de productos
-                        .requestMatchers("/productos/crear").hasRole("ADMIN")
-                        .requestMatchers("/productos/editar/**").hasRole("ADMIN")
-                        .requestMatchers("/productos/eliminar/**").hasRole("ADMIN")
+                // ENDPOINTS DE USUARIO → requieren token
+                .requestMatchers("/usuarios/actualizar").authenticated()
+                .requestMatchers("/usuarios/cambiar-password").authenticated()
+                .requestMatchers("/usuarios/eliminar").authenticated()
 
-                        // CUALQUIER OTRO → requiere token
-                        .anyRequest().authenticated()
-                )
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                // TODO LO DEMÁS → requiere autenticación
+                .anyRequest().authenticated()
+            )
+
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // CORS para permitir conexión desde React
+    // =======================
+    //  CONFIGURACIÓN CORS
+    // =======================
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();

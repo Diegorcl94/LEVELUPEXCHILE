@@ -1,78 +1,176 @@
-export default function Registro(){ return(
-    <main>
-        <main className="container py-5">
-    <h1 className="section-title mb-4">Crea tu cuenta</h1>
+import { useState } from "react";
+import { apiPost } from "../utils/api";
 
-    <form id="registerForm" className="info-card p-4 rounded-4 needs-validation" novalidate>
-      
-      <div id="formAlerts"></div>
+export default function Registro() {
+  const [form, setForm] = useState({
+    nombre: "",
+    apellido: "",
+    email: "",
+    password: "",
+    password2: "",
+    sexo: "",
+    domicilio: "",
+  });
 
-      <div className="row g-3">
-        
-        <div className="col-md-6">
-          <label className="form-label">Nombre</label>
-          <input id="rName" className="form-control" required maxlength="100" placeholder="Tu nombre"></input>
-          <div className="invalid-feedback">Campo obligatorio (máx. 100).</div>
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  function handleChange(e) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  async function handleRegister(e) {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (form.password !== form.password2) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
+
+    try {
+      const body = {
+        nombre: form.nombre,
+        apellido: form.apellido,
+        email: form.email,
+        password: form.password,
+        sexo: form.sexo,
+        domicilio: form.domicilio,
+        fotoPerfil: "",
+        rol: "USER",
+      };
+
+      const data = await apiPost("/auth/register", body);
+
+      // Guardar sesión automáticamente
+      localStorage.setItem("token", data.token);
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          email: data.email,
+          rol: data.rol,
+        })
+      );
+
+      setSuccess("Cuenta creada correctamente ✔");
+
+      setTimeout(() => {
+        window.location.href = "/perfil";
+      }, 1000);
+    } catch (err) {
+      setError("No se pudo registrar. El correo ya existe o el servidor no responde.");
+    }
+  }
+
+  return (
+    <main className="container py-5">
+      <h1 className="section-title mb-4">Crear Cuenta</h1>
+
+      <form onSubmit={handleRegister} className="info-card p-4 rounded-4">
+
+        {error && <div className="alert alert-danger">{error}</div>}
+        {success && <div className="alert alert-success">{success}</div>}
+
+        <div className="row g-3">
+
+          <div className="col-md-6">
+            <label className="form-label">Nombre</label>
+            <input
+              name="nombre"
+              className="form-control"
+              required
+              value={form.nombre}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Apellido</label>
+            <input
+              name="apellido"
+              className="form-control"
+              required
+              value={form.apellido}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-12">
+            <label className="form-label">Correo</label>
+            <input
+              name="email"
+              type="email"
+              className="form-control"
+              required
+              value={form.email}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Contraseña</label>
+            <input
+              name="password"
+              type="password"
+              className="form-control"
+              required
+              minLength="4"
+              maxLength="10"
+              value={form.password}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Confirmar Contraseña</label>
+            <input
+              name="password2"
+              type="password"
+              className="form-control"
+              required
+              minLength="4"
+              maxLength="10"
+              value={form.password2}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Sexo</label>
+            <select
+              name="sexo"
+              className="form-select"
+              value={form.sexo}
+              onChange={handleChange}
+            >
+              <option value="">Seleccione...</option>
+              <option value="hombre">Hombre</option>
+              <option value="mujer">Mujer</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Domicilio</label>
+            <input
+              name="domicilio"
+              className="form-control"
+              value={form.domicilio}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="col-12 d-grid d-md-flex gap-2 mt-3">
+            <button className="btn btn-neon" type="submit">
+              Crear cuenta
+            </button>
+            <a className="btn btn-outline-neon" href="/login">
+              Ya tengo cuenta
+            </a>
+          </div>
         </div>
-
-       
-        <div className="col-md-6">
-          <label className="form-label">Apellido</label>
-          <input id="rLast" className="form-control" maxlength="100" placeholder="Tu apellido"></input>
-        </div>
-
-        
-        <div className="col-12">
-          <label className="form-label">Correo</label>
-          <input
-            id="rEmail"
-            type="email"
-            className="form-control"
-            required
-            maxlength="100"
-            placeholder="tu@duoc.cl"
-            pattern="^[^\s@]{1,100}@(?:duoc\.cl|profesor\.duoc\.cl|gmail\.com)$"></input>
-          <div className="form-text">Permitidos: @duoc.cl, @profesor.duoc.cl, @gmail.com (máx. 100).</div>
-          <div className="invalid-feedback">Correo inválido o dominio no permitido.</div>
-        </div>
-
-        
-        <div className="col-md-6">
-          <label className="form-label">Contraseña</label>
-          <input id="rPass" type="password" className="form-control" required minlength="4" maxlength="10" placeholder="4 a 10 caracteres"></input>
-          <div className="invalid-feedback">Debe tener entre 4 y 10 caracteres.</div>
-        </div>
-
-        
-        <div className="col-md-6">
-          <label className="form-label">Confirmar contraseña</label>
-          <input id="rPass2" type="password" className="form-control" maxlength="10" placeholder="Repite la contraseña"></input>
-          <div className="invalid-feedback">Las contraseñas no coinciden.</div>
-        </div>
-
-        
-        <div className="col-12">
-          <label className="form-label">Código de referido (opcional)</label>
-          <input id="rRefCode" className="form-control" placeholder="Ej: ABC123"></input>
-        </div>
-
-        <div className="col-12">
-          <label className="form-label">Preferencias (categorías favoritas)</label>
-          <input id="rPrefs" className="form-control" placeholder="Consolas, Mouse, Sillas..."></input>
-        </div>
-
-        <div className="col-12 d-grid d-md-flex gap-2">
-          <button className="btn btn-neon" type="submit">Crear cuenta</button>
-          <a className="btn btn-outline-neon" href="/login">Ya tengo cuenta</a>
-        </div>
-      </div>
-    </form>
-  </main>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script type="module" src="JS/main.js"></script>
-
-  
-  
+      </form>
     </main>
-)}
+  );
+}
