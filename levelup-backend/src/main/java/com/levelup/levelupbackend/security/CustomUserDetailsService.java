@@ -1,5 +1,8 @@
 package com.levelup.levelupbackend.security;
 
+import java.util.List;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,10 +27,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        return User.builder()
-                .username(usuario.getEmail())
-                .password(usuario.getPassword()) // ya viene encriptada
-                .roles(usuario.getRol()) // "USER" o "ADMIN"
-                .build();
+        // 🔥 SPRING EXIGE ROLE_USER O ROLE_ADMIN, LO AGREGAMOS AQUÍ
+        String rolFormateado = "ROLE_" + usuario.getRol().toUpperCase();
+
+        return new User(
+                usuario.getEmail(),
+                usuario.getPassword(),  // ya viene encriptado
+                List.of(new SimpleGrantedAuthority(rolFormateado))
+        );
     }
 }

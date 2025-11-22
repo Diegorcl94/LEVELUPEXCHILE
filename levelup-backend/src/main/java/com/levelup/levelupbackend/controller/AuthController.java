@@ -5,14 +5,12 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,9 +38,6 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
 
-    // ============================================================
-    // REGISTER
-    // ============================================================
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody Usuario usuario) {
         try {
@@ -69,92 +64,45 @@ public class AuthController {
         }
     }
 
-    // ============================================================
-    // LOGIN
-    // ============================================================
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Usuario usuario) {
+public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
 
-        try {
-            Usuario u = usuarioService.login(usuario.getEmail(), usuario.getPassword());
+    String email = body.get("email");
+    String password = body.get("password");
 
-            UserDetails userDetails = User.builder()
-                    .username(u.getEmail())
-                    .password(u.getPassword())
-                    .roles(u.getRol())
-                    .build();
+    try {
+        Usuario usuario = usuarioService.obtenerPorEmail(email);
 
-            String token = jwtUtil.generateToken(userDetails);
-
-            Map<String, Object> map = new HashMap<>();
-            map.put("token", token);
-            map.put("email", u.getEmail());
-            map.put("rol", u.getRol());
-
-            return ResponseEntity.ok(map);
-
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales inválidas");
+        // Validar password
+        if (!passwordEncoder.matches(password, usuario.getPassword())) {
+            return ResponseEntity.status(401).body(Map.of("error", "Credenciales inválidas"));
         }
-    }
 
-    // ============================================================
-    // PERFIL
-    // ============================================================
+        UserDetails userDetails = User.builder()
+                .username(usuario.getEmail())
+                .password(usuario.getPassword())
+                .roles(usuario.getRol())
+                .build();
+
+        String token = jwtUtil.generateToken(userDetails);
+
+        // DEVOLVER OBJETO COMPLETO PARA REACT
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", token);
+        response.put("email", usuario.getEmail());
+        response.put("rol", usuario.getRol());
+
+        return ResponseEntity.ok(response);
+
+    } catch (Exception e) {
+        return ResponseEntity.status(401).body(Map.of("error", "Credenciales inválidas"));
+    }
+}
+
+
     @GetMapping("/perfil")
-    public ResponseEntity<?> perfil(Authentication auth) {
+    public ResponseEntity<?> perfil(org.springframework.security.core.Authentication auth) {
         Usuario u = usuarioService.obtenerPorEmail(auth.getName());
         return ResponseEntity.ok(u);
-    }
-
-    // ============================================================
-    // FORGOT PASSWORD (envío de token)
-    // ============================================================
-    @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
-
-        String email = body.get("email");
-
-        try {
-            Usuario u = usuarioService.obtenerPorEmail(email);
-
-            String token = java.util.UUID.randomUUID().toString();
-
-            u.setResetToken(token);
-            u.setResetTokenExpira(System.currentTimeMillis() + (1000 * 60 * 15)); // 15 min
-            usuarioRepository.save(u);
-
-            System.out.println("LINK RECUPERACIÓN:");
-            System.out.println("http://localhost:5173/reset-password?token=" + token);
-
-        } catch (Exception ex) {
-            // Nunca revelar si el correo existe o no.
-        }
-
-        return ResponseEntity.ok("Si el correo existe, enviaremos instrucciones");
-    }
-
-    // ============================================================
-    // RESET PASSWORD (con token)
-    // ============================================================
-    @PutMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
-
-        String token = body.get("token");
-        String nueva = body.get("password");
-
-        Usuario u = usuarioRepository.findByResetToken(token)
-                .orElseThrow(() -> new RuntimeException("Token inválido"));
-
-        if (u.getResetTokenExpira() < System.currentTimeMillis()) {
-            return ResponseEntity.status(400).body("El token ha expirado");
-        }
-
-        u.setPassword(passwordEncoder.encode(nueva));
-        u.setResetToken(null);
-        u.setResetTokenExpira(null);
-        usuarioRepository.save(u);
-
-        return ResponseEntity.ok("Contraseña cambiada con éxito");
     }
 }

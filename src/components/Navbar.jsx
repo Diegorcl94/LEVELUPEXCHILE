@@ -1,127 +1,70 @@
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import "../styles/style.css";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-function Navbar() {
-  const navigate = useNavigate();
+export default function Navbar() {
 
-  // ===============================
-  //  ESTADO DE USER SEGURO
-  // ===============================
-  const [user, setUser] = useState(null);
-  const [carritoCount, setCarritoCount] = useState(0);
+  const [token, setToken] = useState(null);
+  const [rol, setRol] = useState(null);
 
   useEffect(() => {
-    // USER seguro
-    try {
-      const u = JSON.parse(localStorage.getItem("user") || "{}");
-      if (u.email) setUser(u);
-    } catch {
-      setUser(null);
-    }
-
-    // CARRITO seguro
-    try {
-      const c = JSON.parse(localStorage.getItem("carrito") || "[]");
-      setCarritoCount(c.length);
-    } catch {
-      setCarritoCount(0);
-    }
+    setToken(localStorage.getItem("token"));
+    setRol(localStorage.getItem("rol"));
   }, []);
 
-  // ===============================
-  // LOGOUT
-  // ===============================
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-    window.location.reload(); // refresca navbar
-  };
+  function logout() {
+    localStorage.clear();
+    window.location.href = "/login";
+  }
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-neon">
-      <div className="container">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+      <Link className="navbar-brand" to="/">🎮 LevelUp</Link>
 
-        <Link className="navbar-brand text-neon" to="/">
-          🎮 LevelUp
-        </Link>
+      <button className="navbar-toggler" type="button" 
+        data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span className="navbar-toggler-icon"></span>
+      </button>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navMenu"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+      <div className="collapse navbar-collapse" id="navbarNav">
+        <ul className="navbar-nav me-auto">
+          <li className="nav-item"><Link className="nav-link" to="/">Inicio</Link></li>
+          <li className="nav-item"><Link className="nav-link" to="/productos">Productos</Link></li>
+          <li className="nav-item"><Link className="nav-link" to="/contacto">Contacto</Link></li>
 
-        <div className="collapse navbar-collapse" id="navMenu">
-          <ul className="navbar-nav ms-auto">
-
+          {rol === "ADMIN" && (
             <li className="nav-item">
-              <Link className="nav-link text-light" to="/">Inicio</Link>
-            </li>
-
-            <li className="nav-item">
-              <Link className="nav-link text-light" to="/productos">Productos</Link>
-            </li>
-
-            <li className="nav-item">
-              <Link className="nav-link text-light" to="/contacto">Contacto</Link>
-            </li>
-
-            {/* SESIÓN INICIADA */}
-            {user ? (
-              <>
-                <li className="nav-item">
-                  <Link
-                    className="nav-link text-light"
-                    to={user.rol === "ADMIN" ? "/admin-panel" : "/perfil"}
-                  >
-                    {user.rol === "ADMIN" ? "Panel Admin" : "Mi perfil"}
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <button className="btn btn-outline-danger ms-2" onClick={handleLogout}>
-                    Cerrar sesión
-                  </button>
-                </li>
-              </>
-            ) : (
-              <>
-                {/* SIN SESIÓN */}
-                <li className="nav-item">
-                  <Link className="nav-link text-light" to="/login">Iniciar sesión</Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link className="nav-link text-light" to="/registro">Registrarse</Link>
-                </li>
-              </>
-            )}
-
-            {/* ICONO CARRITO */}
-            <li className="nav-item ms-3">
-              <Link className="nav-link text-light position-relative" to="/carrito">
-                🛒
-                {carritoCount > 0 && (
-                  <span
-                    className="badge bg-success position-absolute"
-                    style={{ top: "-5px", right: "-12px" }}
-                  >
-                    {carritoCount}
-                  </span>
-                )}
+              <Link className="nav-link text-warning" to="/admin-panel">
+                Admin Panel ⚡
               </Link>
             </li>
+          )}
+        </ul>
 
-          </ul>
-        </div>
+        <ul className="navbar-nav ms-auto">
+          {!token ? (
+            <>
+              <li className="nav-item">
+                <Link className="nav-link" to="/login">Iniciar sesión</Link>
+              </li>
+              <li className="nav-item">
+                <Link className="nav-link" to="/registro">Registrarse</Link>
+              </li>
+            </>
+          ) : (
+            <>
+              <li className="nav-item">
+                <Link className="nav-link" to="/perfil">Mi Perfil</Link>
+              </li>
+
+              <li className="nav-item">
+                <button className="btn btn-danger ms-3" onClick={logout}>
+                  Cerrar sesión
+                </button>
+              </li>
+            </>
+          )}
+        </ul>
       </div>
     </nav>
   );
 }
-
-export default Navbar;

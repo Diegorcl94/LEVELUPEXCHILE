@@ -10,11 +10,14 @@ public interface UsuarioService {
 
     Usuario obtenerPorEmail(String email);
 
-    Usuario actualizarDatos(String email, Usuario datosActualizados);
+    Usuario actualizarDatos(String email, Usuario datos);
 
     void cambiarPassword(String email, String actual, String nueva);
 
     void resetPassword(String email, String nuevaPassword);
 
     void eliminar(String email);
+
+    // ESTE ES EL QUE FALTABA IMPLEMENTAR
+    void eliminarPorEmail(String email);
 }

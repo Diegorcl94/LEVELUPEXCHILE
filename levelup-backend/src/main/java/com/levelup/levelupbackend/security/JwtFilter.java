@@ -2,6 +2,8 @@ package com.levelup.levelupbackend.security;
 
 import java.io.IOException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +19,8 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
+
     private final JwtUtil jwtUtil;
     private final CustomUserDetailsService userDetailsService;
 
@@ -25,17 +29,20 @@ public class JwtFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
+    // ENDPOINTS QUE NO REQUIEREN TOKEN
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
 
         String path = request.getServletPath();
 
-        // Endpoints EXENTOS de filtro JWT
-        return path.startsWith("/auth/")
+        return path.equals("/auth/login")
+                || path.equals("/auth/register")
+                || path.equals("/auth/forgot-password")
+                || path.equals("/auth/reset-password")
                 || path.startsWith("/v3/api-docs/")
                 || path.startsWith("/swagger-ui/")
                 || path.equals("/swagger-ui.html")
-                || "OPTIONS".equalsIgnoreCase(request.getMethod());  // CORS preflight
+                || "OPTIONS".equalsIgnoreCase(request.getMethod());
     }
 
     @Override
@@ -44,8 +51,21 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String header = request.getHeader("Authorization");
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
+        // 🔥 SI NO HAY TOKEN → SEGUIR SIN BLOQUEAR
+        if (header == null || !header.startsWith("Bearer ")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String token = header.substring(7);
+
+        // 🔥 SI TOKEN VACÍO → NO BLOQUEAR
+        if (token.trim().isEmpty() || token.equals("null") || token.equals("undefined")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        try {
             String email = jwtUtil.extractUsername(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -67,6 +87,9 @@ public class JwtFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
             }
+
+        } catch (Exception e) {
+            logger.warn("JwtFilter error: {}", e.getMessage());
         }
 
         chain.doFilter(request, response);

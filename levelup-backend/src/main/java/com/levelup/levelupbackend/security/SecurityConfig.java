@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -28,17 +29,11 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
-    // =======================
-    //  PASSWORD ENCODER
-    // =======================
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // =======================
-    //  AUTHPROVIDER
-    // =======================
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -47,48 +42,35 @@ public class SecurityConfig {
         return provider;
     }
 
-    // =======================
-    //  AUTH MANAGER
-    // =======================
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // =======================
-    //  SECURITY CHAIN
-    // =======================
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http
-            .csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable())
             .cors(cors -> {})
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             .authorizeHttpRequests(auth -> auth
-                
-                // LIBRES
-                .requestMatchers("/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password").permitAll()
 
-                .requestMatchers(
-                        "/v3/api-docs/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html"
-                ).permitAll()
+                // PUBLIC
+                .requestMatchers("/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password").permitAll()
                 .requestMatchers("/productos/listar").permitAll()
 
-                // CRUD de productos → SOLO ADMIN
-                .requestMatchers("/productos/crear").hasRole("ADMIN")
-                .requestMatchers("/productos/editar/**").hasRole("ADMIN")
-                .requestMatchers("/productos/eliminar/**").hasRole("ADMIN")
+                // SWAGGER
+                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
 
-                // ENDPOINTS DE USUARIO → requieren token
-                .requestMatchers("/usuarios/actualizar").authenticated()
-                .requestMatchers("/usuarios/cambiar-password").authenticated()
-                .requestMatchers("/usuarios/eliminar").authenticated()
+                // API USUARIO
+                .requestMatchers(HttpMethod.PUT, "/api/usuario/**").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/usuario/**").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/usuario/**").authenticated()
 
-                // TODO LO DEMÁS → requiere autenticación
+                // perfil
+                .requestMatchers("/auth/perfil").authenticated()
+
                 .anyRequest().authenticated()
             )
 
@@ -98,9 +80,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // =======================
-    //  CONFIGURACIÓN CORS
-    // =======================
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();

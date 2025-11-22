@@ -10,19 +10,24 @@ import com.levelup.levelupbackend.repository.CompraRepository;
 @Service
 public class CompraServiceImpl implements CompraService {
 
-    private final CompraRepository repo;
+    private final CompraRepository compraRepository;
 
-    public CompraServiceImpl(CompraRepository repo) {
-        this.repo = repo;
+    public CompraServiceImpl(CompraRepository compraRepository) {
+        this.compraRepository = compraRepository;
     }
 
     @Override
     public Compra guardar(Compra compra) {
-        return repo.save(compra);
+        return compraRepository.save(compra);
     }
 
     @Override
     public List<Compra> obtenerPorUsuario(String email) {
-        return repo.findByUsuarioEmail(email);
+        return compraRepository.findByEmail(email);
+    }
+
+    @Override
+    public void eliminarComprasDeUsuario(String email) {
+        compraRepository.deleteByEmail(email);
     }
 }

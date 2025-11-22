@@ -1,7 +1,5 @@
 package com.levelup.levelupbackend.model;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,29 +15,60 @@ public class Compra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String usuarioEmail;
+    private String email;     // Usuario que realizó la compra
+
+    private String fecha;
 
     @Column(columnDefinition = "LONGTEXT")
     private String productos;
 
-    private Integer total;
+    private Double total;
 
-    private LocalDateTime fecha = LocalDateTime.now();
-
+    // ===========================
+    // CONSTRUCTOR VACÍO
+    // ===========================
     public Compra() {}
 
-    // GETTERS Y SETTERS
-    public Long getId() { return id; }
+    // ===========================
+    // GETTERS & SETTERS
+    // ===========================
+    public Long getId() {
+        return id;
+    }
 
-    public String getUsuarioEmail() { return usuarioEmail; }
-    public void setUsuarioEmail(String usuarioEmail) { this.usuarioEmail = usuarioEmail; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getProductos() { return productos; }
-    public void setProductos(String productos) { this.productos = productos; }
+    public String getEmail() {
+        return email;
+    }
 
-    public Integer getTotal() { return total; }
-    public void setTotal(Integer total) { this.total = total; }
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-    public LocalDateTime getFecha() { return fecha; }
-    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    public String getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getProductos() {
+        return productos;
+    }
+
+    public void setProductos(String productos) {
+        this.productos = productos;
+    }
+
+    public Double getTotal() {
+        return total;
+    }
+
+    public void setTotal(Double total) {
+        this.total = total;
+    }
 }

@@ -41,10 +41,19 @@ function App() {
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/login" element={<Login />} />
           <Route path="/registro" element={<Registro />} />
-          <Route path="/perfil" element={<Perfil />} />
           <Route path="/soporte" element={<Soporte />} />
 
-          {/* ADMIN SOLO */}
+          {/* 🔒 USUARIO AUTENTICADO */}
+          <Route
+            path="/perfil"
+            element={
+              <ProtectedRoute>
+                <Perfil />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 🔒 ADMIN */}
           <Route
             path="/admin-panel"
             element={

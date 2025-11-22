@@ -62,7 +62,7 @@ public class JwtUtil {
 
     public String generateToken(UserDetails user) {
 
-        // Extraer rol desde UserDetails
+        // 🔥 IMPORTANTE: aquí el rol ya viene con "ROLE_USER" o "ROLE_ADMIN"
         String role = user.getAuthorities().stream()
                 .findFirst()
                 .orElseThrow()

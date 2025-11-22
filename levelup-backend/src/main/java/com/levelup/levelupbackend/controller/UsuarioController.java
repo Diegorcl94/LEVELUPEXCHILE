@@ -1,86 +1,66 @@
 package com.levelup.levelupbackend.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.levelup.levelupbackend.model.Usuario;
-import com.levelup.levelupbackend.repository.UsuarioRepository;
 import com.levelup.levelupbackend.service.UsuarioService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import java.util.Map;
-
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping("/api/usuario")
 @CrossOrigin("*")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
-    private final UsuarioRepository usuarioRepository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(
-            UsuarioService usuarioService,
-            UsuarioRepository usuarioRepository,
-            PasswordEncoder passwordEncoder) {
-
+    public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
-        this.usuarioRepository = usuarioRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
-    // ====================================================
-    // 1) ACTUALIZAR PERFIL (nombre, apellido, sexo, domicilio, foto)
-    // ====================================================
-    @PutMapping("/actualizar")
-    public ResponseEntity<?> actualizarPerfil(Authentication auth, @RequestBody Usuario datos) {
+    // ===========================
+    // ACTUALIZAR PERFIL
+    // ===========================
+    @PutMapping("/{email}")
+    public ResponseEntity<?> actualizarPerfil(
+            @PathVariable String email,
+            @RequestBody Usuario datos) {
 
-        String email = auth.getName();
-        Usuario u = usuarioService.obtenerPorEmail(email);
-
-        u.setNombre(datos.getNombre());
-        u.setApellido(datos.getApellido());
-        u.setSexo(datos.getSexo());
-        u.setDomicilio(datos.getDomicilio());
-        u.setFotoPerfil(datos.getFotoPerfil());
-
-        usuarioRepository.save(u);
-        return ResponseEntity.ok("Perfil actualizado con éxito");
+        Usuario u = usuarioService.actualizarDatos(email, datos);
+        return ResponseEntity.ok(u);
     }
 
-    // ====================================================
-    // 2) CAMBIAR CONTRASEÑA
-    // ====================================================
-    @PutMapping("/cambiar-password")
-    public ResponseEntity<?> cambiarPassword(Authentication auth, @RequestBody Map<String, String> request) {
+    // ===========================
+    // CAMBIAR PASSWORD
+    // ===========================
+    @PutMapping("/{email}/password")
+    public ResponseEntity<?> cambiarPassword(
+            @PathVariable String email,
+            @RequestBody(required = true) PasswordDTO body) {
 
-        String email = auth.getName();
-        Usuario u = usuarioService.obtenerPorEmail(email);
-
-        String nueva = request.get("password");
-
-        if (nueva == null || nueva.isBlank()) {
-            return ResponseEntity.badRequest().body("Contraseña inválida");
-        }
-
-        u.setPassword(passwordEncoder.encode(nueva));
-        usuarioRepository.save(u);
-
-        return ResponseEntity.ok("Contraseña cambiada correctamente");
+        usuarioService.resetPassword(email, body.getNueva());
+        return ResponseEntity.ok("Contraseña actualizada correctamente");
     }
 
-    // ====================================================
-    // 3) ELIMINAR CUENTA
-    // ====================================================
-    @DeleteMapping("/eliminar")
-    public ResponseEntity<?> eliminarCuenta(Authentication auth) {
+    // DTO usado para recibir { nueva: "" }
+    public static class PasswordDTO {
+        private String nueva;
+        public String getNueva() { return nueva; }
+        public void setNueva(String nueva) { this.nueva = nueva; }
+    }
 
-        String email = auth.getName();
-        Usuario u = usuarioService.obtenerPorEmail(email);
+    // ===========================
+    // ELIMINAR USUARIO
+    // ===========================
+    @DeleteMapping("/{email}")
+    public ResponseEntity<?> eliminarCuenta(@PathVariable String email) {
 
-        usuarioRepository.delete(u);
-
-        return ResponseEntity.ok("Cuenta eliminada");
+        usuarioService.eliminarPorEmail(email);
+        return ResponseEntity.ok("Cuenta eliminada correctamente");
     }
 }

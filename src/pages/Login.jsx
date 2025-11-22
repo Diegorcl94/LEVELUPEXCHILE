@@ -11,35 +11,29 @@ export default function Login() {
     setError("");
 
     try {
-      const data = await apiPost("/auth/login", {
-        email,
-        password,
-      });
+      const data = await apiPost("/auth/login", { email, password });
 
-      // ================================
-      // GUARDAR SESIÓN DE FORMA SEGURA
-      // ================================
-      localStorage.setItem("token", String(data.token)); // 🔥 FIX TOKEN
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          email: data.email,
-          rol: data.rol,
-        })
-      );
+      if (!data.token) {
+        setError("Credenciales incorrectas");
+        return;
+      }
 
-      // ================================
-      // REDIRECCIÓN SEGÚN ROL
-      // ================================
+      // 🔥 GUARDAR TOKEN CORRECTAMENTE
+      localStorage.setItem("token", data.token);
+
+      // 🔥 GUARDAR EMAIL Y ROL
+      localStorage.setItem("email", data.email);
+      localStorage.setItem("rol", data.rol);
+
+      // 🔥 REDIRECCIÓN
       if (data.rol === "ADMIN") {
         window.location.href = "/admin-panel";
       } else {
         window.location.href = "/perfil";
       }
 
-    } catch (err) {
-      console.error("Error login:", err);
-      setError("Credenciales incorrectas o servidor no disponible");
+    } catch {
+      setError("Correo o contraseña inválida");
     }
   }
 
@@ -70,15 +64,6 @@ export default function Login() {
 
         <button className="btn btn-neon mt-4 w-100">Iniciar sesión</button>
 
-        <div className="mt-3 text-center">
-          <a href="/registro" className="text-neon">
-            ¿No tienes cuenta? Regístrate aquí
-          </a>
-          <br />
-          <a href="/recuperar" className="text-warning">
-            ¿Olvidaste tu contraseña?
-          </a>
-        </div>
       </form>
     </main>
   );

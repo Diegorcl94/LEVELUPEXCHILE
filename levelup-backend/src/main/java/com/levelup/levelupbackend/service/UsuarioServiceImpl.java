@@ -1,5 +1,7 @@
 package com.levelup.levelupbackend.service;
 
+import java.util.Optional;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -17,27 +19,20 @@ public class UsuarioServiceImpl implements UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // ============================================
+    // REGISTRAR
+    // ============================================
     @Override
-    public Usuario registrar(Usuario usuario) {
-        usuario.setEmail(usuario.getEmail().trim().toLowerCase());
-
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            throw new IllegalArgumentException("El email ya existe");
-        }
-
-        if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
-            usuario.setRol("USER");
-        }
-
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-
-        return usuarioRepository.save(usuario);
+    public Usuario registrar(Usuario u) {
+        u.setPassword(passwordEncoder.encode(u.getPassword()));
+        return usuarioRepository.save(u);
     }
 
+    // ============================================
+    // LOGIN
+    // ============================================
     @Override
     public Usuario login(String email, String password) {
-        email = email.trim().toLowerCase();
-
         Usuario u = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -48,15 +43,20 @@ public class UsuarioServiceImpl implements UsuarioService {
         return u;
     }
 
+    // ============================================
+    // OBTENER POR EMAIL
+    // ============================================
     @Override
     public Usuario obtenerPorEmail(String email) {
-        return usuarioRepository.findByEmail(email.toLowerCase())
+        return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
     }
 
+    // ============================================
+    // ACTUALIZAR DATOS PERFIL
+    // ============================================
     @Override
     public Usuario actualizarDatos(String email, Usuario datos) {
-
         Usuario u = obtenerPorEmail(email);
 
         u.setNombre(datos.getNombre());
@@ -68,29 +68,50 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.save(u);
     }
 
+    // ============================================
+    // CAMBIAR PASSWORD (CON VALIDACIÓN)
+    // ============================================
     @Override
     public void cambiarPassword(String email, String actual, String nueva) {
-
         Usuario u = obtenerPorEmail(email);
 
         if (!passwordEncoder.matches(actual, u.getPassword())) {
-            throw new RuntimeException("La contraseña actual no es correcta");
+            throw new RuntimeException("Contraseña actual incorrecta");
         }
 
         u.setPassword(passwordEncoder.encode(nueva));
         usuarioRepository.save(u);
     }
 
+    // ============================================
+    // RESET PASSWORD (SIN VALIDAR CONTRASEÑA ACTUAL)
+    // ============================================
     @Override
     public void resetPassword(String email, String nuevaPassword) {
         Usuario u = obtenerPorEmail(email);
-
         u.setPassword(passwordEncoder.encode(nuevaPassword));
         usuarioRepository.save(u);
     }
 
+    // ============================================
+    // ELIMINAR (NUNCA LA USAMOS)
+    // ============================================
     @Override
     public void eliminar(String email) {
-        usuarioRepository.deleteByEmail(email.toLowerCase());
+        usuarioRepository.deleteByEmail(email);
+    }
+
+    // ============================================
+    // ELIMINAR POR EMAIL (LA QUE USA EL PERFIL)
+    // ============================================
+    @Override
+    public void eliminarPorEmail(String email) {
+        Optional<Usuario> u = usuarioRepository.findByEmail(email);
+
+        if (u.isPresent()) {
+            usuarioRepository.delete(u.get());
+        } else {
+            throw new RuntimeException("Usuario no encontrado");
+        }
     }
 }
