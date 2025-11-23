@@ -20,6 +20,12 @@ import ProductosAdmin from "./pages/admin/ProductosAdmin";
 import CrearProducto from "./pages/admin/CrearProducto";
 import EditarProducto from "./pages/admin/EditarProducto";
 
+// 👉 NUEVOS ADMIN
+import BlogAdmin from "./pages/admin/BlogAdmin";
+import EventosAdmin from "./pages/admin/EventosAdmin";
+import DestacadosAdmin from "./pages/admin/DestacadosAdmin";
+import BannerAdmin from "./pages/admin/BannerAdmin"; // 👈 NUEVO
+
 import ProtectedRoute from "./components/ProtectedRoute";
 
 import "./styles/style.css";
@@ -32,7 +38,7 @@ function App() {
       <main className="flex-grow-1 bg-dark text-light">
         <Routes>
 
-          {/* PÚBLICO */}
+          {/* ============ PÚBLICO ============ */}
           <Route path="/" element={<Home />} />
           <Route path="/productos" element={<Productos />} />
           <Route path="/blog" element={<Blog />} />
@@ -43,7 +49,7 @@ function App() {
           <Route path="/registro" element={<Registro />} />
           <Route path="/soporte" element={<Soporte />} />
 
-          {/* 🔒 USUARIO AUTENTICADO */}
+          {/* ============ USUARIO AUTENTICADO ============ */}
           <Route
             path="/perfil"
             element={
@@ -53,7 +59,7 @@ function App() {
             }
           />
 
-          {/* 🔒 ADMIN */}
+          {/* ============ ADMIN ============ */}
           <Route
             path="/admin-panel"
             element={
@@ -63,6 +69,7 @@ function App() {
             }
           />
 
+          {/* PRODUCTOS ADMIN */}
           <Route
             path="/admin-panel/productos"
             element={
@@ -86,6 +93,46 @@ function App() {
             element={
               <ProtectedRoute requireAdmin={true}>
                 <EditarProducto />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* BLOG ADMIN */}
+          <Route
+            path="/admin-panel/blog"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <BlogAdmin />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* EVENTOS ADMIN */}
+          <Route
+            path="/admin-panel/eventos"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <EventosAdmin />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* DESTACADOS ADMIN */}
+          <Route
+            path="/admin-panel/destacados"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <DestacadosAdmin />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* BANNERS ADMIN */}
+          <Route
+            path="/admin-panel/banners"
+            element={
+              <ProtectedRoute requireAdmin={true}>
+                <BannerAdmin />
               </ProtectedRoute>
             }
           />

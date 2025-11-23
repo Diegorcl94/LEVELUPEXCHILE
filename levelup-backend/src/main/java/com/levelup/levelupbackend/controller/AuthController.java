@@ -44,10 +44,12 @@ public class AuthController {
             usuario.setRol("USER");
             Usuario nuevo = usuarioService.registrar(usuario);
 
+            String roleFormatted = "ROLE_USER";
+
             UserDetails userDetails = User.builder()
                     .username(nuevo.getEmail())
                     .password(nuevo.getPassword())
-                    .roles("USER")
+                    .authorities(roleFormatted)
                     .build();
 
             String token = jwtUtil.generateToken(userDetails);
@@ -55,7 +57,7 @@ public class AuthController {
             Map<String, Object> res = new HashMap<>();
             res.put("token", token);
             res.put("email", nuevo.getEmail());
-            res.put("rol", "USER");
+            res.put("rol", roleFormatted);
 
             return ResponseEntity.ok(res);
 
@@ -65,40 +67,40 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
+    public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
 
-    String email = body.get("email");
-    String password = body.get("password");
+        String email = body.get("email");
+        String password = body.get("password");
 
-    try {
-        Usuario usuario = usuarioService.obtenerPorEmail(email);
+        try {
+            Usuario usuario = usuarioService.obtenerPorEmail(email);
 
-        // Validar password
-        if (!passwordEncoder.matches(password, usuario.getPassword())) {
+            if (!passwordEncoder.matches(password, usuario.getPassword())) {
+                return ResponseEntity.status(401).body(Map.of("error", "Credenciales inválidas"));
+            }
+
+            // AQUI SE ARREGLA: AGREGAR ROLE_
+            String roleFormatted = "ROLE_" + usuario.getRol().toUpperCase();
+
+            UserDetails userDetails = User.builder()
+                    .username(usuario.getEmail())
+                    .password(usuario.getPassword())
+                    .authorities(roleFormatted)
+                    .build();
+
+            String token = jwtUtil.generateToken(userDetails);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("email", usuario.getEmail());
+            response.put("rol", roleFormatted);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
             return ResponseEntity.status(401).body(Map.of("error", "Credenciales inválidas"));
         }
-
-        UserDetails userDetails = User.builder()
-                .username(usuario.getEmail())
-                .password(usuario.getPassword())
-                .roles(usuario.getRol())
-                .build();
-
-        String token = jwtUtil.generateToken(userDetails);
-
-        // DEVOLVER OBJETO COMPLETO PARA REACT
-        Map<String, Object> response = new HashMap<>();
-        response.put("token", token);
-        response.put("email", usuario.getEmail());
-        response.put("rol", usuario.getRol());
-
-        return ResponseEntity.ok(response);
-
-    } catch (Exception e) {
-        return ResponseEntity.status(401).body(Map.of("error", "Credenciales inválidas"));
     }
-}
-
 
     @GetMapping("/perfil")
     public ResponseEntity<?> perfil(org.springframework.security.core.Authentication auth) {

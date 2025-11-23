@@ -1,16 +1,17 @@
 import { Navigate } from "react-router-dom";
 
-export default function ProtectedRoute({ children, requireAdmin = false }) {
+export default function ProtectedRoute({ children, requireAdmin }) {
+  
   const token = localStorage.getItem("token");
   const rol = localStorage.getItem("rol");
 
-  // ❌ Si no hay token → NO ENTRA
+  // No autenticado
   if (!token) {
     return <Navigate to="/login" replace />;
   }
 
-  // 🔥 Validar rol si la ruta necesita admin
-  if (requireAdmin && rol !== "ADMIN") {
+  // Ruta solo para ADMIN
+  if (requireAdmin && rol !== "ROLE_ADMIN") {
     return <Navigate to="/" replace />;
   }
 

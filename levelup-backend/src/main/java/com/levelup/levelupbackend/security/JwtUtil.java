@@ -35,38 +35,28 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    public String extractRole(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("role", String.class);
-    }
-
     public boolean validateToken(String token, UserDetails user) {
         String username = extractUsername(token);
         return username.equals(user.getUsername()) && !isExpired(token);
     }
 
     private boolean isExpired(String token) {
-        Date expiration = Jwts.parserBuilder()
+        Date exp = Jwts.parserBuilder()
                 .setSigningKey(key())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getExpiration();
 
-        return expiration.before(new Date());
+        return exp.before(new Date());
     }
 
     public String generateToken(UserDetails user) {
 
-        // 🔥 IMPORTANTE: aquí el rol ya viene con "ROLE_USER" o "ROLE_ADMIN"
         String role = user.getAuthorities().stream()
                 .findFirst()
                 .orElseThrow()
-                .getAuthority();
+                .getAuthority(); // ROLE_ADMIN o ROLE_USER
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role);

@@ -1,81 +1,133 @@
-import dragonballsparkin from '../assets/img/dragonballsparkin.png'
-import { Routes, Route } from 'react-router-dom'
-import Blog from './Blog'
-import Carrito from './Carrito'
-import Eventos from './Eventos'
-import Login from './Login'
-import Perfil from './Perfil'
-import Productos from './Productos'
-import Registro from './Registro'
-import Soporte from './Soporte'
+import { useEffect, useState } from "react";
+import { apiGet } from "../utils/api";
+import { Link } from "react-router-dom";
+import BannerCarousel from "../components/BannerCarousel";
 
-export default function Home(){
+export default function Home() {
+
+  const [blog, setBlog] = useState([]);
+  const [destacados, setDestacados] = useState([]);
+
+  useEffect(() => {
+    async function cargarData() {
+
+      // BLOG: últimos 4 posts
+      const posts = await apiGet("/blog/listar");
+      const ordenados = posts
+        .sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
+        .slice(0, 4);
+      setBlog(ordenados);
+
+      // DESTACADOS: últimos 4
+      const des = await apiGet("/destacados/listar");
+      setDestacados(des.slice(0, 4));
+    }
+
+    cargarData();
+  }, []);
+
   return (
-    
-  <main>
-   
-    <div id="heroCarousel" className="carousel slide carousel--compact" data-bs-ride="carousel">
-            
-      <div className="carousel-inner">
-        <div className="carousel-item active" data-bs-interval="5000">
-          <img src={dragonballsparkin} alt="Nuevos lanzamientos gamer"></img>
-          <div className="carousel-caption d-none d-md-block">
-            <h5 className="section-title">Nuevos lanzamientos</h5>
-            <p>APROVECHA LOS DESCUENTOS para correos DUOC (+20% de por vida).</p>
-            <a href="/producto" className="btn btn-neon btn-sm">Ver catálogo</a>
+    <main>
+
+      {/* ================================
+          HERO DINÁMICO (BANNERS)
+         ================================= */}
+      <BannerCarousel />
+
+      {/* ================================
+          SECCIÓN IMPACTO
+         ================================= */}
+      <section className="hero text-center text-white py-5">
+        <div className="container">
+          <h1 className="display-5 fw-bold title-glow">Tu próxima aventura comienza aquí</h1>
+          <p className="lead text-secondary">Ofertas, comunidad y eventos. Gana puntos LevelUp con referidos.</p>
+
+          <div className="d-flex gap-3 justify-content-center mt-3">
+            <a className="btn btn-neon btn-lg" href="/productos">Ver productos</a>
+            <a className="btn btn-outline-neon btn-lg" href="/eventos">Ver Eventos</a>
           </div>
         </div>
-      </div>      
-    </div>
+      </section>
 
-    
-    <section className="hero text-center text-white py-5">
-      <div className="container">
-        <h1 className="display-5 fw-bold title-glow">Tu próxima aventura comienza aquí</h1>
-        <p className="lead text-secondary">Ofertas, comunidad y eventos. Gana puntos LevelUp con referidos.</p>
-        <div className="d-flex gap-3 justify-content-center mt-3">
-          <a className="btn btn-neon btn-lg" href="/producto">Explorar Catálogo</a>
-          <a className="btn btn-outline-neon btn-lg" href="/eventos">Ver Eventos</a>
+      {/* ================================
+          DESTACADOS DINÁMICOS
+         ================================= */}
+      <section className="container my-5">
+
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2 className="section-title">Destacados</h2>
+          <a className="btn btn-sm btn-outline-neon" href="/productos">Ver productos</a>
         </div>
-      </div>
-    </section>
 
-    
-    <section className="container my-5">
-      <div className="row g-4 align-items-center">
-        <div className="col-lg-6">
-          <div className="info-card p-4 rounded-4">
-            <h3 className="mb-2">Impacto Comunitario</h3>
-            <p className="mb-2">Apoyamos eventos locales y streamers chilenos. Parte de las compras financia torneos y becas gamer.</p>
-            <div className="small text-secondary">Tus puntos LevelUp pueden canjearse por descuentos y productos.</div>
-          </div>
+        <div className="row g-3">
+          {destacados.length === 0 && (
+            <p className="text-secondary">No hay destacados aún.</p>
+          )}
+
+          {destacados.map((d) => (
+            <div key={d.id} className="col-12 col-md-6 col-lg-3">
+              <div className="info-card p-3 rounded-4 h-100 bg-dark text-light shadow-sm border border-success">
+
+                <img
+                  src={d.imagen}
+                  alt={d.titulo}
+                  className="img-fluid rounded-3 mb-2"
+                  style={{ maxHeight: "220px", objectFit: "cover" }}
+                />
+
+                <strong>{d.titulo}</strong>
+                <p className="small text-secondary">{d.descripcion}</p>
+
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    </section>
 
-    
-    <section className="container my-5">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="section-title">Productos Destacados</h2>
-        <a className="btn btn-sm btn-outline-neon" href="producto">Ver todo</a>
-      </div>
-      <div id="featuredGrid" className="row g-3">
-        
-        ...
-      </div>
-    </section>
+      </section>
 
-    
-    <section className="container my-5">
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="section-title">Últimas del Blog</h2>
-        <a className="btn btn-sm btn-outline-neon" href="/blog">Ver blog</a>
-      </div>
-      <div id="blogPreview" className="row g-3"></div>
-    </section>
+      {/* ================================
+          BLOG DINÁMICO
+         ================================= */}
+      <section className="container my-5">
 
-  
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    </main>   
-  )
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h2 className="section-title">Últimas del Blog</h2>
+          <a className="btn btn-sm btn-outline-neon" href="/blog">Ver blog</a>
+        </div>
+
+        <div className="row g-3">
+
+          {blog.length === 0 && (
+            <p className="text-secondary">No hay posts disponibles.</p>
+          )}
+
+          {blog.map((p) => (
+            <div key={p.id} className="col-12 col-md-6 col-lg-3">
+              <div className="p-3 bg-dark text-light rounded-4 h-100">
+
+                <img
+                  src={p.imagen}
+                  alt={p.titulo}
+                  className="img-fluid rounded-3 mb-2"
+                  style={{ height: "160px", objectFit: "cover" }}
+                />
+
+                <h5>{p.titulo}</h5>
+
+                <Link
+                  className="btn btn-outline-light btn-sm mt-2"
+                  to={`/blog/${p.id}`}
+                >
+                  Leer más
+                </Link>
+
+              </div>
+            </div>
+          ))}
+
+        </div>
+      </section>
+
+    </main>
+  );
 }

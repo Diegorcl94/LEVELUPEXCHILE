@@ -26,6 +26,12 @@ export default function DashboardAdmin() {
       link: "/admin-panel/destacados",
       icon: "⭐",
       color: "#FFD700"
+    },
+    {
+      title: "Banners",
+      link: "/admin-panel/banners",
+      icon: "🖼️",
+      color: "#FF8C00" // naranja neon
     }
   ];
 
@@ -42,11 +48,15 @@ export default function DashboardAdmin() {
               className="admin-card d-flex flex-column align-items-center justify-content-center"
               style={{
                 border: `2px solid ${c.color}`,
-                boxShadow: `0 0 12px ${c.color}`
+                boxShadow: `0 0 12px ${c.color}`,
+                textDecoration: "none",
+                borderRadius: "20px",
+                padding: "40px 10px",
+                background: "#111"
               }}
             >
               <div className="display-3">{c.icon}</div>
-              <h4 className="mt-3">{c.title}</h4>
+              <h4 className="mt-3 text-light">{c.title}</h4>
             </a>
           </div>
         ))}

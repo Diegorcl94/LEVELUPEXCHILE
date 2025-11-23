@@ -1,8 +1,12 @@
 const API_URL = "http://localhost:8080";
 
 function getToken() {
-  const t = localStorage.getItem("token");
-  return t ? t.replace(/"/g, "") : "";
+  try {
+    const t = localStorage.getItem("token");
+    return t ? t.replace(/"/g, "") : "";
+  } catch {
+    return "";
+  }
 }
 
 async function parseResponse(res) {
@@ -12,11 +16,12 @@ async function parseResponse(res) {
 
 export async function apiGet(path) {
   return fetch(`${API_URL}${path}`, {
+    method: "GET",
     headers: {
       "Authorization": `Bearer ${getToken()}`,
       "Content-Type": "application/json",
       "Accept": "application/json"
-    },
+    }
   }).then(parseResponse);
 }
 
@@ -28,7 +33,7 @@ export async function apiPost(path, body) {
       "Content-Type": "application/json",
       "Accept": "application/json"
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body)
   }).then(parseResponse);
 }
 
@@ -40,7 +45,7 @@ export async function apiPut(path, body) {
       "Content-Type": "application/json",
       "Accept": "application/json"
     },
-    body: JSON.stringify(body),
+    body: JSON.stringify(body)
   }).then(parseResponse);
 }
 
@@ -51,6 +56,6 @@ export async function apiDelete(path) {
       "Authorization": `Bearer ${getToken()}`,
       "Content-Type": "application/json",
       "Accept": "application/json"
-    },
+    }
   }).then(parseResponse);
 }

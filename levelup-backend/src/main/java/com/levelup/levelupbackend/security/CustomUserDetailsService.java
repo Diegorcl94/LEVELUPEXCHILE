@@ -27,13 +27,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-        // 🔥 SPRING EXIGE ROLE_USER O ROLE_ADMIN, LO AGREGAMOS AQUÍ
-        String rolFormateado = "ROLE_" + usuario.getRol().toUpperCase();
+        // AUTORIDAD CORRECTA PARA SPRING
+        String roleFormatted = "ROLE_" + usuario.getRol().toUpperCase();
 
         return new User(
                 usuario.getEmail(),
-                usuario.getPassword(),  // ya viene encriptado
-                List.of(new SimpleGrantedAuthority(rolFormateado))
+                usuario.getPassword(),
+                List.of(new SimpleGrantedAuthority(roleFormatted))
         );
     }
 }

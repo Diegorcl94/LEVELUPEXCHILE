@@ -53,27 +53,42 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable())
             .cors(cors -> {})
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
             .authorizeHttpRequests(auth -> auth
 
-                // PUBLIC
-                .requestMatchers("/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password").permitAll()
+                .requestMatchers("/auth/login", "/auth/register").permitAll()
+
                 .requestMatchers("/productos/listar").permitAll()
+                .requestMatchers("/blog/listar").permitAll()
+                .requestMatchers("/eventos/listar").permitAll()
+                .requestMatchers("/destacados/listar").permitAll()
+                .requestMatchers("/banners/listar").permitAll()
 
-                // SWAGGER
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                // API USUARIO
-                .requestMatchers(HttpMethod.PUT, "/api/usuario/**").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/api/usuario/**").authenticated()
-                .requestMatchers(HttpMethod.GET, "/api/usuario/**").authenticated()
-
-                // perfil
                 .requestMatchers("/auth/perfil").authenticated()
+
+                .requestMatchers(HttpMethod.POST, "/productos/crear").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/productos/editar/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/productos/eliminar/**").hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.POST, "/blog/crear").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/blog/editar/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/blog/eliminar/**").hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.POST, "/eventos/crear").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/eventos/editar/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/eventos/eliminar/**").hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.POST, "/destacados/crear").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/destacados/editar/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/destacados/eliminar/**").hasRole("ADMIN")
+
+                .requestMatchers(HttpMethod.POST, "/banners/crear").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/banners/editar/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/banners/eliminar/**").hasRole("ADMIN")
 
                 .anyRequest().authenticated()
             )
-
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

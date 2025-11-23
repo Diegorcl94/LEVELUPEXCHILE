@@ -1,69 +1,47 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Navbar() {
 
-  const [token, setToken] = useState(null);
-  const [rol, setRol] = useState(null);
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    setToken(localStorage.getItem("token"));
-    setRol(localStorage.getItem("rol"));
-  }, []);
+  const token = localStorage.getItem("token");
+  const rol = localStorage.getItem("rol");
 
   function logout() {
     localStorage.clear();
-    window.location.href = "/login";
+    navigate("/login");
   }
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+    <nav className="navbar navbar-dark bg-dark px-3">
+
       <Link className="navbar-brand" to="/">🎮 LevelUp</Link>
 
-      <button className="navbar-toggler" type="button" 
-        data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span className="navbar-toggler-icon"></span>
-      </button>
+      <div className="d-flex align-items-center gap-3">
 
-      <div className="collapse navbar-collapse" id="navbarNav">
-        <ul className="navbar-nav me-auto">
-          <li className="nav-item"><Link className="nav-link" to="/">Inicio</Link></li>
-          <li className="nav-item"><Link className="nav-link" to="/productos">Productos</Link></li>
-          <li className="nav-item"><Link className="nav-link" to="/contacto">Contacto</Link></li>
+        <Link to="/">Inicio</Link>
+        <Link to="/productos">Productos</Link>
+        <Link to="/contacto">Contacto</Link>
 
-          {rol === "ADMIN" && (
-            <li className="nav-item">
-              <Link className="nav-link text-warning" to="/admin-panel">
-                Admin Panel ⚡
-              </Link>
-            </li>
-          )}
-        </ul>
+        {rol === "ROLE_ADMIN" && (
+          <Link to="/admin-panel" className="text-warning">
+            Admin Panel ⚡
+          </Link>
+        )}
 
-        <ul className="navbar-nav ms-auto">
-          {!token ? (
-            <>
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">Iniciar sesión</Link>
-              </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/registro">Registrarse</Link>
-              </li>
-            </>
-          ) : (
-            <>
-              <li className="nav-item">
-                <Link className="nav-link" to="/perfil">Mi Perfil</Link>
-              </li>
+        {token ? (
+          <>
+            <Link to="/perfil">Mi Perfil</Link>
+            <button className="btn btn-danger btn-sm" onClick={logout}>
+              Cerrar sesión
+            </button>
+          </>
+        ) : (
+          <Link className="btn btn-neon btn-sm" to="/login">
+            Ingresar
+          </Link>
+        )}
 
-              <li className="nav-item">
-                <button className="btn btn-danger ms-3" onClick={logout}>
-                  Cerrar sesión
-                </button>
-              </li>
-            </>
-          )}
-        </ul>
       </div>
     </nav>
   );

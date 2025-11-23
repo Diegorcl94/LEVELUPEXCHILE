@@ -1,70 +1,67 @@
 import { useState } from "react";
 import { apiPost } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  async function handleLogin(e) {
-    e.preventDefault();
+  const navigate = useNavigate();
+
+  async function handleLogin() {
     setError("");
 
-    try {
-      const data = await apiPost("/auth/login", { email, password });
+    const res = await apiPost("/auth/login", { email, password });
 
-      if (!data.token) {
-        setError("Credenciales incorrectas");
-        return;
-      }
-
-      // 🔥 GUARDAR TOKEN CORRECTAMENTE
-      localStorage.setItem("token", data.token);
-
-      // 🔥 GUARDAR EMAIL Y ROL
-      localStorage.setItem("email", data.email);
-      localStorage.setItem("rol", data.rol);
-
-      // 🔥 REDIRECCIÓN
-      if (data.rol === "ADMIN") {
-        window.location.href = "/admin-panel";
-      } else {
-        window.location.href = "/perfil";
-      }
-
-    } catch {
-      setError("Correo o contraseña inválida");
+    if (res.error) {
+      setError("Credenciales inválidas");
+      return;
     }
+
+    // GUARDAR TOKEN + ROL + EMAIL
+    localStorage.setItem("token", res.token);
+    localStorage.setItem("rol", res.rol);
+    localStorage.setItem("email", res.email);
+
+    // ADMIN → PANEL
+    if (res.rol === "ROLE_ADMIN") {
+      navigate("/admin-panel");
+      return;
+    }
+
+    // USUARIO NORMAL
+    navigate("/perfil");
   }
 
   return (
-    <main className="container py-5">
-      <h1 className="section-title mb-4">Iniciar sesión</h1>
+    <div className="container text-light py-5">
 
-      <form className="info-card p-4 rounded-4" onSubmit={handleLogin}>
-        {error && <div className="alert alert-danger">{error}</div>}
+      <h2 className="mb-4">Iniciar sesión</h2>
 
-        <label className="form-label">Correo</label>
-        <input
-          className="form-control"
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+      {error && (
+        <div className="alert alert-danger">{error}</div>
+      )}
 
-        <label className="form-label mt-3">Contraseña</label>
-        <input
-          className="form-control"
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+      <input
+        className="form-control mb-2"
+        placeholder="Correo"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
 
-        <button className="btn btn-neon mt-4 w-100">Iniciar sesión</button>
+      <input
+        type="password"
+        className="form-control mb-3"
+        placeholder="Contraseña"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
 
-      </form>
-    </main>
+      <button className="btn btn-neon w-100" onClick={handleLogin}>
+        Ingresar
+      </button>
+    </div>
   );
 }
