@@ -2,60 +2,81 @@ import { useEffect, useState } from "react";
 import { apiGet } from "../utils/api";
 
 export default function BannerCarousel() {
+
   const [banners, setBanners] = useState([]);
 
   useEffect(() => {
-    async function load() {
+    async function cargar() {
       const data = await apiGet("/banners/listar");
-      setBanners(data.filter(b => b.activo));
+      const activos = data
+        .filter(b => b.activo)
+        .sort((a, b) => a.orden - b.orden);
+
+      setBanners(activos);
     }
-    load();
+
+    cargar();
   }, []);
 
-  if (banners.length === 0) return null;
+  if (banners.length === 0) {
+    return null;
+  }
 
   return (
-    <div id="mainCarousel" className="carousel slide" data-bs-ride="carousel">
+    <div id="mainBanner" className="carousel slide" data-bs-ride="carousel">
+
+      {/* ITEMS */}
       <div className="carousel-inner">
 
-        {banners.map((b, i) => (
-          <div key={b.id} className={`carousel-item ${i === 0 ? "active" : ""}`} data-bs-interval="5000">
+        {banners.map((b, index) => (
+          <div
+            key={b.id}
+            className={`carousel-item ${index === 0 ? "active" : ""}`}
+            data-bs-interval="5000"
+          >
 
-            {/* Si hay enlace → conviértelo en un <a> clickeable */}
-            {b.enlace ? (
-              <a href={b.enlace}>
-                <img
-                  src={b.imagen}
-                  className="d-block w-100"
-                  style={{ height: "450px", objectFit: "cover" }}
-                />
-              </a>
-            ) : (
-              <img
-                src={b.imagen}
-                className="d-block w-100"
-                style={{ height: "450px", objectFit: "cover" }}
-              />
-            )}
+            <img
+              src={b.imagen}
+              alt={b.titulo}
+              className="d-block w-100"
+              style={{ maxHeight: "500px", objectFit: "cover" }}
+            />
 
-            {(b.titulo || b.descripcion) && (
-              <div className="carousel-caption d-none d-md-block">
-                <h3>{b.titulo}</h3>
-                <p>{b.descripcion}</p>
-              </div>
-            )}
+            <div className="carousel-caption d-none d-md-block">
+              <h2 className="fw-bold">{b.titulo}</h2>
+              <p>{b.descripcion}</p>
+
+              {b.enlace && (
+                <a href={b.enlace} className="btn btn-neon btn-sm">
+                  Ir a enlace
+                </a>
+              )}
+            </div>
           </div>
         ))}
 
       </div>
 
-      <button className="carousel-control-prev" type="button" data-bs-target="#mainCarousel" data-bs-slide="prev">
-        <span className="carousel-control-prev-icon"></span>
+      {/*  <-- CONTROL LEFT --> */}
+      <button
+        className="carousel-control-prev"
+        type="button"
+        data-bs-target="#mainBanner"
+        data-bs-slide="prev"
+      >
+        <span className="carousel-control-prev-icon" aria-hidden="true"></span>
       </button>
 
-      <button className="carousel-control-next" type="button" data-bs-target="#mainCarousel" data-bs-slide="next">
-        <span className="carousel-control-next-icon"></span>
+      {/*  --> CONTROL RIGHT --> */}
+      <button
+        className="carousel-control-next"
+        type="button"
+        data-bs-target="#mainBanner"
+        data-bs-slide="next"
+      >
+        <span className="carousel-control-next-icon" aria-hidden="true"></span>
       </button>
+
     </div>
   );
 }
