@@ -15,7 +15,7 @@ public class Compra {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String email;     // Usuario que realizó la compra
+    private String usuarioEmail;  // ✔ nombre correcto
 
     private String fecha;
 
@@ -24,14 +24,8 @@ public class Compra {
 
     private Double total;
 
-    // ===========================
-    // CONSTRUCTOR VACÍO
-    // ===========================
     public Compra() {}
 
-    // ===========================
-    // GETTERS & SETTERS
-    // ===========================
     public Long getId() {
         return id;
     }
@@ -40,12 +34,12 @@ public class Compra {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsuarioEmail() {
+        return usuarioEmail;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsuarioEmail(String usuarioEmail) {
+        this.usuarioEmail = usuarioEmail;
     }
 
     public String getFecha() {

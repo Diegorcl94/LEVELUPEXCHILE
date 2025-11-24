@@ -23,13 +23,11 @@ public class CompraController {
         this.service = service;
     }
 
-    // GUARDAR COMPRA
     @PostMapping("/guardar")
     public ResponseEntity<?> guardar(@RequestBody Compra compra) {
         return ResponseEntity.ok(service.guardar(compra));
     }
 
-    // OBTENER HISTORIAL
     @GetMapping("/usuario/{email}")
     public ResponseEntity<?> historial(@PathVariable String email) {
         return ResponseEntity.ok(service.obtenerPorUsuario(email));

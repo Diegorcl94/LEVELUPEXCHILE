@@ -29,29 +29,45 @@ public class JwtFilter extends OncePerRequestFilter {
         this.userDetailsService = userDetailsService;
     }
 
-    // ENDPOINTS QUE NO REQUIEREN TOKEN
+    // =====================================================
+    //  🔥 IMPORTANTÍSIMO:
+    //  Aquí definimos rutas SIN TOKEN
+    // =====================================================
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
 
         String path = request.getServletPath();
+        String method = request.getMethod();
+
+        // Permitir cualquier preflight OPTIONS
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            return true;
+        }
 
         return path.equals("/auth/login")
                 || path.equals("/auth/register")
                 || path.equals("/auth/forgot-password")
                 || path.equals("/auth/reset-password")
+
+                // ✔ PERMITE COMPRAR SIN TOKEN
+                || path.contains("/compras/guardar")
+
+                // Swagger
                 || path.startsWith("/v3/api-docs/")
                 || path.startsWith("/swagger-ui/")
-                || path.equals("/swagger-ui.html")
-                || "OPTIONS".equalsIgnoreCase(request.getMethod());
+                || path.equals("/swagger-ui.html");
     }
 
+    // =====================================================
+    //  🔐 VALIDACIÓN JWT SOLO CUANDO SE REQUIERE
+    // =====================================================
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
 
-        // 🔥 SI NO HAY TOKEN → SEGUIR SIN BLOQUEAR
+        // Si NO hay token → seguimos normal
         if (header == null || !header.startsWith("Bearer ")) {
             chain.doFilter(request, response);
             return;
@@ -59,7 +75,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = header.substring(7);
 
-        // 🔥 SI TOKEN VACÍO → NO BLOQUEAR
+        // Token vacío o inválido → seguir normal
         if (token.trim().isEmpty() || token.equals("null") || token.equals("undefined")) {
             chain.doFilter(request, response);
             return;
@@ -69,6 +85,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String email = jwtUtil.extractUsername(token);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 if (jwtUtil.validateToken(token, userDetails)) {

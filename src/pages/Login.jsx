@@ -20,18 +20,15 @@ export default function Login() {
       return;
     }
 
-    // GUARDAR TOKEN + ROL + EMAIL
     localStorage.setItem("token", res.token);
     localStorage.setItem("rol", res.rol);
     localStorage.setItem("email", res.email);
 
-    // ADMIN → PANEL
     if (res.rol === "ROLE_ADMIN") {
       navigate("/admin-panel");
       return;
     }
 
-    // USUARIO NORMAL
     navigate("/perfil");
   }
 
@@ -40,9 +37,7 @@ export default function Login() {
 
       <h2 className="mb-4">Iniciar sesión</h2>
 
-      {error && (
-        <div className="alert alert-danger">{error}</div>
-      )}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       <input
         className="form-control mb-2"
@@ -62,6 +57,12 @@ export default function Login() {
       <button className="btn btn-neon w-100" onClick={handleLogin}>
         Ingresar
       </button>
+
+      <div className="text-center mt-3">
+        <a href="/registro" className="text-neon">
+          ¿No tienes cuenta? Crear cuenta
+        </a>
+      </div>
     </div>
   );
 }

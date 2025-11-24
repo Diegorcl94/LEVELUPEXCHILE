@@ -15,6 +15,13 @@ export default function ProductCard({ id, nombre, precio, imagen, descripcion, c
   }
 
   function handleAdd() {
+    const item = { id, nombre, precio };
+
+    const carritoActual = JSON.parse(localStorage.getItem("carrito")) || [];
+    carritoActual.push(item);
+
+    localStorage.setItem("carrito", JSON.stringify(carritoActual));
+
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   }
@@ -30,7 +37,6 @@ export default function ProductCard({ id, nombre, precio, imagen, descripcion, c
           style={{ maxHeight: "230px", objectFit: "cover", border: "1px solid #198754" }}
         />
 
-        {/* CATEGORÍA */}
         {categoria && (
           <div className="badge bg-success text-dark fw-bold mb-1" style={{ width: "fit-content" }}>
             {categoria.toUpperCase()}

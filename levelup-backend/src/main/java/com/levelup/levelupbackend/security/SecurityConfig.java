@@ -55,6 +55,8 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
 
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                 .requestMatchers("/auth/login", "/auth/register").permitAll()
 
                 .requestMatchers("/productos/listar").permitAll()
@@ -63,29 +65,11 @@ public class SecurityConfig {
                 .requestMatchers("/destacados/listar").permitAll()
                 .requestMatchers("/banners/listar").permitAll()
 
+                .requestMatchers(HttpMethod.POST, "/compras/guardar").permitAll()
+
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                 .requestMatchers("/auth/perfil").authenticated()
-
-                .requestMatchers(HttpMethod.POST, "/productos/crear").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/productos/editar/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/productos/eliminar/**").hasRole("ADMIN")
-
-                .requestMatchers(HttpMethod.POST, "/blog/crear").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/blog/editar/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/blog/eliminar/**").hasRole("ADMIN")
-
-                .requestMatchers(HttpMethod.POST, "/eventos/crear").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/eventos/editar/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/eventos/eliminar/**").hasRole("ADMIN")
-
-                .requestMatchers(HttpMethod.POST, "/destacados/crear").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/destacados/editar/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/destacados/eliminar/**").hasRole("ADMIN")
-
-                .requestMatchers(HttpMethod.POST, "/banners/crear").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/banners/editar/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/banners/eliminar/**").hasRole("ADMIN")
 
                 .anyRequest().authenticated()
             )
@@ -101,11 +85,11 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of("*"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
-
         return new CorsFilter(source);
     }
 }

@@ -8,9 +8,5 @@ import com.levelup.levelupbackend.model.Compra;
 
 public interface CompraRepository extends JpaRepository<Compra, Long> {
 
-    // Todas las compras de un usuario
-    List<Compra> findByEmail(String email);
-
-    // Eliminar compras de un usuario
-    void deleteByEmail(String email);
+    List<Compra> findByUsuarioEmail(String usuarioEmail); // ✔ correcto
 }

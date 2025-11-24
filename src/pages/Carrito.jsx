@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-export default function Carrito() {
+function Carrito() {
   const [carrito, setCarrito] = useState([]);
   const [total, setTotal] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
@@ -23,30 +23,40 @@ export default function Carrito() {
     setTotal(suma);
   };
 
-  async function finalizarCompra() {
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user) {
-      alert("Debes iniciar sesión para comprar.");
-      return;
+  function aplicarDescuento() {
+    const codigo = document.getElementById("codigo").value;
+
+    if (codigo.toLowerCase() === "duoc uc") {
+      setTotal(total * 0.7);
+      alert("Descuento 30% aplicado ✔");
+    } else {
+      alert("Código inválido ❌");
     }
+  }
+
+  async function finalizarCompra() {
+
+    let email = localStorage.getItem("email");
+    if (!email) email = "INVITADO";
 
     const compra = {
-      usuarioEmail: user.email,
+      usuarioEmail: email,
+      fecha: new Date().toISOString().split("T")[0],
       productos: JSON.stringify(carrito),
       total: total
     };
 
     try {
       await axios.post("http://localhost:8080/compras/guardar", compra);
-      setModalVisible(true); // MOSTRAR MODAL ANIMADO
+      setModalVisible(true);
 
-      // limpiar carrito
       localStorage.setItem("carrito", JSON.stringify([]));
       setCarrito([]);
       setTotal(0);
 
     } catch (e) {
-      alert("Error al procesar la compra");
+      console.log(e);
+      alert("Error al procesar la compra ❌");
     }
   }
 
@@ -68,7 +78,16 @@ export default function Carrito() {
             </div>
           ))}
 
-          <h3 className="text-neon mt-4">Total: ${total.toLocaleString("es-CL")}</h3>
+          <div className="mt-3">
+            <input id="codigo" className="form-control" placeholder="Código de descuento" />
+            <button className="btn btn-outline-neon w-100 mt-2" onClick={aplicarDescuento}>
+              Aplicar descuento
+            </button>
+          </div>
+
+          <h3 className="text-neon mt-4">
+            Total: ${total.toLocaleString("es-CL")}
+          </h3>
 
           <button className="btn btn-neon w-100 mt-3" onClick={finalizarCompra}>
             Finalizar compra 💳
@@ -76,18 +95,13 @@ export default function Carrito() {
         </>
       )}
 
-      {/* ========================== */}
-      {/* MODAL NEÓN DE COMPRA EXITOSA */}
-      {/* ========================== */}
       {modalVisible && (
         <div className="modal-compra show" onClick={() => setModalVisible(false)}>
           <div className="modal-content-neon" onClick={(e) => e.stopPropagation()}>
             <h2 className="text-neon">¡Compra exitosa! 🎉</h2>
             <p className="text-light mt-3">
-              Gracias por tu compra en <strong>LevelUp</strong>.  
-              Revisa tu historial en tu perfil.
+              Gracias por tu compra en <strong>LevelUp</strong>.
             </p>
-
             <button className="btn btn-success w-100 mt-3" onClick={() => setModalVisible(false)}>
               Cerrar
             </button>
@@ -97,3 +111,5 @@ export default function Carrito() {
     </div>
   );
 }
+
+export default Carrito;
