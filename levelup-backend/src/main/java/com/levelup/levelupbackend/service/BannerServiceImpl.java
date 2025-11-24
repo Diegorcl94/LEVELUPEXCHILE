@@ -18,26 +18,28 @@ public class BannerServiceImpl implements BannerService {
 
     @Override
     public List<Banner> listar() {
-        return repo.findAllByOrderByOrdenAsc();
+        return repo.findAll();
     }
 
     @Override
-    public Banner crear(Banner b) {
+    public Banner guardar(Banner b) {
         return repo.save(b);
     }
 
     @Override
-    public Banner actualizar(Long id, Banner b) {
-        Banner original = repo.findById(id)
+    public Banner editar(Long id, Banner up) {
+
+        Banner b = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Banner no encontrado"));
 
-        original.setTitulo(b.getTitulo());
-        original.setDescripcion(b.getDescripcion());
-        original.setImagen(b.getImagen());
-        original.setActivo(b.getActivo());
-        original.setOrden(b.getOrden());
+        b.setImagen(up.getImagen());
+        b.setTitulo(up.getTitulo());
+        b.setDescripcion(up.getDescripcion());
+        b.setEnlace(up.getEnlace());
+        b.setOrden(up.getOrden());
+        b.setActivo(up.getActivo());
 
-        return repo.save(original);
+        return repo.save(b);
     }
 
     @Override

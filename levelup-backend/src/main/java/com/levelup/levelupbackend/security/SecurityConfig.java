@@ -57,19 +57,27 @@ public class SecurityConfig {
 
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
+                // PUBLICO
                 .requestMatchers("/auth/login", "/auth/register").permitAll()
-
                 .requestMatchers("/productos/listar").permitAll()
                 .requestMatchers("/blog/listar").permitAll()
                 .requestMatchers("/eventos/listar").permitAll()
                 .requestMatchers("/destacados/listar").permitAll()
                 .requestMatchers("/banners/listar").permitAll()
 
+                // COMPRAS
                 .requestMatchers(HttpMethod.POST, "/compras/guardar").permitAll()
 
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                // ADMIN BANNERS (🔥 ESTO ES LO QUE FALTABA)
+                .requestMatchers(HttpMethod.POST, "/banners/crear").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/banners/editar/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/banners/eliminar/**").hasRole("ADMIN")
 
+                // PERFIL
                 .requestMatchers("/auth/perfil").authenticated()
+
+                // SWAGGER
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
                 .anyRequest().authenticated()
             )

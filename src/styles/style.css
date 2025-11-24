@@ -475,3 +475,89 @@ body[data-page="soporte"] .form-control--light::placeholder {
   transform: translateY(-2px);
 }
 
+/* ================================
+   FIX TEXTO DE BANNERS EN ADMIN  
+   ================================ */
+.list-group-item span,
+.list-group-item b,
+.list-group-item {
+  color: #fff !important;
+}
+
+/* También corregimos el color gris oculto */
+.list-group-item small,
+.list-group-item .text-muted {
+  color: #ccc !important;
+}
+
+/* El bloque del texto dentro del <li> */
+.list-group-item .banner-info {
+  color: #fff !important;
+}
+
+/* El texto que está dentro del span (bienvenido, fortnite, etc.) */
+.list-group-item span * {
+  color: #fff !important;
+}
+
+/* ================================
+   FIX TEXTO DE BANNERS EN ADMIN  
+   ================================ */
+.list-group-item span,
+.list-group-item b,
+.list-group-item {
+  color: #fff !important;
+}
+
+/* También corregimos el color gris oculto */
+.list-group-item small,
+.list-group-item .text-muted {
+  color: #ccc !important;
+}
+
+/* El bloque del texto dentro del <li> */
+.list-group-item .banner-info {
+  color: #fff !important;
+}
+
+/* El texto que está dentro del span (bienvenido, fortnite, etc.) */
+.list-group-item span * {
+  color: #fff !important;
+}
+
+/* =============================
+   ESTILOS VISIBLES PARA LISTA DE BANNERS
+   ============================= */
+.banners-list-card {
+  background: #0f0f0f !important;
+  border: 1px solid rgba(255,255,255,0.15) !important;
+  color: #fff !important;
+  padding: 18px !important;
+  border-radius: 12px;
+}
+
+.banners-list-card b,
+.banners-list-card span,
+.banners-list-card small {
+  color: #fff !important;
+}
+
+.banners-list-card .badge {
+  background: #39ff14 !important;
+  color: #000 !important;
+}
+
+.banners-list-card .btn-warning,
+.banners-list-card .btn-danger {
+  font-weight: bold;
+}
+
+.banners-list-card .btn-warning {
+  background: #ffcc00;
+  color: #000;
+}
+
+.banners-list-card .btn-danger {
+  background: #ff4444;
+  color: #fff;
+}

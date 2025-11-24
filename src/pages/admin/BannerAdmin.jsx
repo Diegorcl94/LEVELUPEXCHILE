@@ -4,234 +4,181 @@ import { apiGet, apiPost, apiPut, apiDelete } from "../../utils/api";
 export default function BannerAdmin() {
 
   const [banners, setBanners] = useState([]);
-
   const [form, setForm] = useState({
     imagen: "",
     titulo: "",
     descripcion: "",
     enlace: "",
-    orden: 1,
+    orden: "1",
     activo: true
   });
 
   const [editId, setEditId] = useState(null);
 
-  // =============================
+  // ============================
   // CARGAR BANNERS
-  // =============================  
-  async function cargar() {
+  // ============================
+  async function cargarBanners() {
     const data = await apiGet("/banners/listar");
     setBanners(data);
   }
 
   useEffect(() => {
-    cargar();
+    cargarBanners();
   }, []);
 
-  // =============================
-  // HANDLER CAMBIO DE FORMULARIO
-  // =============================
+  // ============================
+  // HANDLE CHANGE
+  // ============================
   function handleChange(e) {
     const { name, value } = e.target;
 
-    // Si el campo es número → convertir
-    if (name === "orden") {
-      setForm({ ...form, orden: Number(value) });
-    }
-    // Si el campo es boolean → convertir
-    else if (name === "activo") {
+    if (name === "activo") {
       setForm({ ...form, activo: value === "true" });
-    }
-    else {
+    } else {
       setForm({ ...form, [name]: value });
     }
   }
 
-  // =============================
+  // ============================
   // CREAR BANNER
-  // =============================
+  // ============================
   async function crearBanner() {
-    await apiPost("/banners/crear", {
+    const body = {
       ...form,
       orden: Number(form.orden),
-      activo: Boolean(form.activo)
-    });
+      activo: form.activo === true
+    };
 
-    setForm({
-      imagen: "",
-      titulo: "",
-      descripcion: "",
-      enlace: "",
-      orden: 1,
-      activo: true
-    });
-
-    cargar();
+    await apiPost("/banners/crear", body);
+    setForm({ imagen: "", titulo: "", descripcion: "", enlace: "", orden: "1", activo: true });
+    cargarBanners();
+    alert("Banner creado correctamente");
   }
 
-  // =============================
-  // ELIMINAR
-  // =============================
-  async function eliminar(id) {
-    await apiDelete(`/banners/eliminar/${id}`);
-    cargar();
-  }
-
-  // =============================
-  // EDITAR — CARGAR FORM
-  // =============================
-  function openEdit(banner) {
-    setEditId(banner.id);
-    setForm({
-      imagen: banner.imagen,
-      titulo: banner.titulo,
-      descripcion: banner.descripcion,
-      enlace: banner.enlace || "",
-      orden: banner.orden,
-      activo: banner.activo
-    });
-  }
-
-  // =============================
+  // ============================
   // GUARDAR EDICIÓN
-  // =============================
+  // ============================
   async function guardarEdit() {
-    await apiPut(`/banners/editar/${editId}`, {
+    const body = {
       ...form,
       orden: Number(form.orden),
-      activo: Boolean(form.activo)
-    });
+      activo: form.activo === true
+    };
 
+    await apiPut(`/banners/editar/${editId}`, body);
     setEditId(null);
-    setForm({
-      imagen: "",
-      titulo: "",
-      descripcion: "",
-      enlace: "",
-      orden: 1,
-      activo: true
-    });
-
-    cargar();
+    setForm({ imagen: "", titulo: "", descripcion: "", enlace: "", orden: "1", activo: true });
+    cargarBanners();
+    alert("Banner actualizado");
   }
 
+  // ============================
+  // CARGAR DATOS EN FORMULARIO
+  // ============================
+  function cargarParaEditar(b) {
+    setEditId(b.id);
+    setForm({
+      imagen: b.imagen,
+      titulo: b.titulo,
+      descripcion: b.descripcion,
+      enlace: b.enlace,
+      orden: String(b.orden),
+      activo: b.activo
+    });
+  }
+
+  // ============================
+  // ELIMINAR BANNER
+  // ============================
+  async function eliminarBanner(id) {
+    if (!confirm("¿Seguro que quieres eliminar este banner?")) return;
+    await apiDelete(`/banners/eliminar/${id}`);
+    cargarBanners();
+  }
+
+  // ============================
+  // RENDER
+  // ============================
   return (
-    <div className="container py-4 text-light">
-      <h2 className="mb-4">Administrar Banners</h2>
+    <div className="container mt-4">
 
-      {/* FORMUARIO */}
-      <div className="bg-dark p-4 rounded-4 border border-success mb-4">
+      <h2 className="text-center mb-4">Administrar Banners</h2>
 
-        <h5>{editId ? "Editar banner" : "Crear nuevo banner"}</h5>
+      <div className="card p-4">
 
-        <input
-          className="form-control my-2"
-          placeholder="URL imagen"
-          name="imagen"
-          value={form.imagen}
-          onChange={handleChange}
-        />
+        <input className="form-control my-2" name="imagen" placeholder="URL imagen"
+          value={form.imagen} onChange={handleChange} />
 
-        <input
-          className="form-control my-2"
-          placeholder="Título"
-          name="titulo"
-          value={form.titulo}
-          onChange={handleChange}
-        />
+        <input className="form-control my-2" name="titulo" placeholder="Título"
+          value={form.titulo} onChange={handleChange} />
 
-        <input
-          className="form-control my-2"
-          placeholder="Descripción"
-          name="descripcion"
-          value={form.descripcion}
-          onChange={handleChange}
-        />
+        <input className="form-control my-2" name="descripcion" placeholder="Descripción"
+          value={form.descripcion} onChange={handleChange} />
 
-        <input
-          className="form-control my-2"
-          placeholder="Enlace (producto, categoría, blog, evento o URL)"
-          name="enlace"
-          value={form.enlace}
-          onChange={handleChange}
-        />
+        <input className="form-control my-2" name="enlace" placeholder="Enlace"
+          value={form.enlace} onChange={handleChange} />
 
-        <input
-          className="form-control my-2"
-          type="number"
-          placeholder="Orden"
-          name="orden"
-          value={form.orden}
-          onChange={handleChange}
-        />
+        <input className="form-control my-2" name="orden" placeholder="Orden"
+          value={form.orden} onChange={handleChange} />
 
+        {/* SELECT ACTIVO/INACTIVO */}
         <select
           className="form-select my-2"
           name="activo"
-          value={form.activo}
+          value={form.activo ? "true" : "false"}
           onChange={handleChange}
         >
-          <option value={true}>Activo</option>
-          <option value={false}>Inactivo</option>
+          <option value="true">Activo</option>
+          <option value="false">Inactivo</option>
         </select>
 
-        {editId ? (
-          <button className="btn btn-warning w-100 mt-3" onClick={guardarEdit}>
-            Guardar cambios
-          </button>
+        {!editId ? (
+          <button className="btn btn-success mt-2" onClick={crearBanner}>Crear Banner</button>
         ) : (
-          <button className="btn btn-neon w-100 mt-3" onClick={crearBanner}>
-            Crear Banner
-          </button>
+          <button className="btn btn-primary mt-2" onClick={guardarEdit}>Guardar Cambios</button>
         )}
+
       </div>
 
-      {/* LISTADO */}
-      <h4 className="mb-3">Banners creados</h4>
+      <hr />
 
-      <div className="row g-3">
-        {banners.map((b) => (
-          <div key={b.id} className="col-12 col-md-6 col-lg-4">
+      <h3>Listado de Banners</h3>
 
-            <div className="p-3 bg-dark border border-secondary rounded-4 h-100">
-              <img
-                src={b.imagen}
-                className="img-fluid rounded mb-2"
-                style={{ height: "160px", objectFit: "cover" }}
-              />
+      <ul className="list-group mt-3">
+        {banners.map(b => (
+          <li
+            key={b.id}
+            className="list-group-item banners-list-card d-flex justify-content-between align-items-center mb-2"
+          >
+            <div>
+              <b>{b.titulo}</b>
+              <span> — Orden {b.orden} — </span>
 
-              <h5>{b.titulo}</h5>
-              <p className="small text-secondary">{b.descripcion}</p>
+              <span className="badge">
+                {b.activo ? "Activo" : "Inactivo"}
+              </span>
+            </div>
 
-              {b.enlace && (
-                <p className="small text-info">
-                  <strong>Enlace:</strong> {b.enlace}
-                </p>
-              )}
-
-              <p className="small">
-                <strong>Orden:</strong> {b.orden} <br />
-                <strong>Activo:</strong> {b.activo ? "Sí" : "No"}
-              </p>
-
+            <div>
               <button
-                className="btn btn-warning btn-sm w-100 mb-2"
-                onClick={() => openEdit(b)}
+                className="btn btn-warning btn-sm mx-1"
+                onClick={() => cargarParaEditar(b)}
               >
                 Editar
               </button>
 
               <button
-                className="btn btn-danger btn-sm w-100"
-                onClick={() => eliminar(b.id)}
+                className="btn btn-danger btn-sm"
+                onClick={() => eliminarBanner(b.id)}
               >
                 Eliminar
               </button>
             </div>
-
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
+
     </div>
   );
 }

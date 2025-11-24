@@ -7,7 +7,10 @@ import com.levelup.levelupbackend.model.Banner;
 public interface BannerService {
 
     List<Banner> listar();
-    Banner crear(Banner b);
-    Banner actualizar(Long id, Banner b);
+
+    Banner guardar(Banner b);
+
+    Banner editar(Long id, Banner b);
+
     void eliminar(Long id);
 }
