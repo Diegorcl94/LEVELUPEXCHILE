@@ -53,9 +53,7 @@ export default function Home() {
       <section className="container my-5">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h2 className="section-title">Destacados</h2>
-          <a className="btn btn-sm btn-outline-neon" href="/productos">
-            Ver productos
-          </a>
+          
         </div>
 
         <div className="row g-3">

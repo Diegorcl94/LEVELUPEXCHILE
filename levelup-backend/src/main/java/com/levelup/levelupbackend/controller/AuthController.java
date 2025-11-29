@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.levelup.levelupbackend.model.Direccion;
 import com.levelup.levelupbackend.model.Usuario;
+import com.levelup.levelupbackend.repository.DireccionRepository;
 import com.levelup.levelupbackend.repository.UsuarioRepository;
 import com.levelup.levelupbackend.security.JwtUtil;
 import com.levelup.levelupbackend.service.UsuarioService;
@@ -27,30 +29,53 @@ public class AuthController {
 
     private final UsuarioService usuarioService;
     private final UsuarioRepository usuarioRepository;
+    private final DireccionRepository direccionRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthController(UsuarioService usuarioService, UsuarioRepository usuarioRepository,
-                          PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public AuthController(
+            UsuarioService usuarioService,
+            UsuarioRepository usuarioRepository,
+            DireccionRepository direccionRepository,
+            PasswordEncoder passwordEncoder,
+            JwtUtil jwtUtil) {
         this.usuarioService = usuarioService;
         this.usuarioRepository = usuarioRepository;
+        this.direccionRepository = direccionRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> register(@RequestBody Map<String, Object> body) {
         try {
+            Usuario usuario = new Usuario();
+            usuario.setNombre((String) body.get("nombre"));
+            usuario.setApellido((String) body.get("apellido"));
+            usuario.setEmail((String) body.get("email"));
+            usuario.setPassword(passwordEncoder.encode((String) body.get("password")));
+            usuario.setSexoId(Long.valueOf(body.get("sexoId").toString()));
             usuario.setRol("USER");
-            Usuario nuevo = usuarioService.registrar(usuario);
+
+            Usuario nuevo = usuarioRepository.save(usuario);
+
+            // === GUARDAR DIRECCIÓN ===
+            Direccion d = new Direccion();
+            d.setUsuarioId(nuevo.getId());
+            d.setDireccion((String) body.get("direccion"));
+            d.setCiudad((String) body.get("ciudad"));
+            d.setRegion((String) body.get("region"));
+            d.setPais((String) body.get("pais"));
+
+            direccionRepository.save(d);
 
             String roleFormatted = "ROLE_USER";
 
             UserDetails userDetails = User.builder()
-                    .username(nuevo.getEmail())
-                    .password(nuevo.getPassword())
-                    .authorities(roleFormatted)
-                    .build();
+                .username(nuevo.getEmail())
+                .password(nuevo.getPassword())
+                .authorities(roleFormatted)
+                .build();
 
             String token = jwtUtil.generateToken(userDetails);
 
@@ -79,7 +104,6 @@ public class AuthController {
                 return ResponseEntity.status(401).body(Map.of("error", "Credenciales inválidas"));
             }
 
-            // AQUI SE ARREGLA: AGREGAR ROLE_
             String roleFormatted = "ROLE_" + usuario.getRol().toUpperCase();
 
             UserDetails userDetails = User.builder()
@@ -90,12 +114,11 @@ public class AuthController {
 
             String token = jwtUtil.generateToken(userDetails);
 
-            Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
-            response.put("email", usuario.getEmail());
-            response.put("rol", roleFormatted);
-
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(Map.of(
+                    "token", token,
+                    "email", usuario.getEmail(),
+                    "rol", roleFormatted
+            ));
 
         } catch (Exception e) {
             return ResponseEntity.status(401).body(Map.of("error", "Credenciales inválidas"));

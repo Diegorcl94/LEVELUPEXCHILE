@@ -61,9 +61,10 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         u.setNombre(datos.getNombre());
         u.setApellido(datos.getApellido());
-        u.setSexo(datos.getSexo());
-        u.setDomicilio(datos.getDomicilio());
+        u.setSexoId(datos.getSexoId()); // ← actualizado (antes getSexo)
         u.setFotoPerfil(datos.getFotoPerfil());
+
+        // domicilio eliminado → ahora va en tabla direcciones
 
         return usuarioRepository.save(u);
     }
@@ -84,7 +85,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     // ============================================
-    // RESET PASSWORD (SIN VALIDAR CONTRASEÑA ACTUAL)
+    // RESET PASSWORD
     // ============================================
     @Override
     public void resetPassword(String email, String nuevaPassword) {
@@ -94,7 +95,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     // ============================================
-    // ELIMINAR (NUNCA LA USAMOS)
+    // ELIMINAR
     // ============================================
     @Override
     public void eliminar(String email) {
@@ -102,7 +103,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     // ============================================
-    // ELIMINAR POR EMAIL (LA QUE USA EL PERFIL)
+    // ELIMINAR POR EMAIL
     // ============================================
     @Override
     public void eliminarPorEmail(String email) {

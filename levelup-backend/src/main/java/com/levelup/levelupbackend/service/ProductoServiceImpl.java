@@ -36,7 +36,6 @@ public class ProductoServiceImpl implements ProductoService {
         // Normalizar
         p.setNombre(p.getNombre().trim());
         p.setDescripcion(p.getDescripcion().trim());
-        p.setCategoria(p.getCategoria().trim());
 
         return repo.save(p);
     }
@@ -56,7 +55,7 @@ public class ProductoServiceImpl implements ProductoService {
         original.setDescripcion(p.getDescripcion().trim());
         original.setImagen(p.getImagen());
         original.setPrecio(p.getPrecio());
-        original.setCategoria(p.getCategoria().trim());
+        original.setCategoriaId(p.getCategoriaId()); // ← actualizado
 
         return repo.save(original);
     }
@@ -90,7 +89,7 @@ public class ProductoServiceImpl implements ProductoService {
             throw new IllegalArgumentException("El precio debe ser mayor a 0");
         }
 
-        if (p.getCategoria() == null || p.getCategoria().trim().isEmpty()) {
+        if (p.getCategoriaId() == null || p.getCategoriaId() <= 0) {
             throw new IllegalArgumentException("La categoría es obligatoria");
         }
     }

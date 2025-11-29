@@ -27,8 +27,9 @@ public class Producto {
     @Column(nullable = false)
     private Integer precio;
 
-    @Column(nullable = false)
-    private String categoria;
+    // NUEVO → FK a la tabla categorias
+    @Column(name = "categoria_id", nullable = false)
+    private Long categoriaId;
 
     public Producto() {}
 
@@ -48,6 +49,6 @@ public class Producto {
     public Integer getPrecio() { return precio; }
     public void setPrecio(Integer precio) { this.precio = precio; }
 
-    public String getCategoria() { return categoria; }
-    public void setCategoria(String categoria) { this.categoria = categoria; }
+    public Long getCategoriaId() { return categoriaId; }
+    public void setCategoriaId(Long categoriaId) { this.categoriaId = categoriaId; }
 }

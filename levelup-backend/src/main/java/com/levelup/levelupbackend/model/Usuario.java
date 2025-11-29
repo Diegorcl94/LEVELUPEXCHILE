@@ -27,14 +27,19 @@ public class Usuario {
     @Column(nullable = false, length = 150)
     private String password;
 
-    private String sexo;
-    private String domicilio;
+    // NUEVO → FK a la tabla sexos
+    @Column(name = "sexo_id")
+    private Long sexoId;
+
+    // Se elimina porque ahora usaremos la tabla direcciones
+    // private String domicilio;
+
     private String fotoPerfil;
 
     @Column(nullable = false)
     private String rol;
 
-    // =============== CAMPOS PARA RESET PASSWORD ===============
+    // =============== RESET PASSWORD ===============
     private String resetToken;
     private Long resetTokenExpira;
 
@@ -57,11 +62,8 @@ public class Usuario {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getSexo() { return sexo; }
-    public void setSexo(String sexo) { this.sexo = sexo; }
-
-    public String getDomicilio() { return domicilio; }
-    public void setDomicilio(String domicilio) { this.domicilio = domicilio; }
+    public Long getSexoId() { return sexoId; }
+    public void setSexoId(Long sexoId) { this.sexoId = sexoId; }
 
     public String getFotoPerfil() { return fotoPerfil; }
     public void setFotoPerfil(String fotoPerfil) { this.fotoPerfil = fotoPerfil; }

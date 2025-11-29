@@ -41,7 +41,7 @@ export default function ProductosList() {
   return (
     <section className="container mt-5">
 
-      <h2 className="section-title mb-4 text-neon text-center">Catálogo de Juegos 🎮</h2>
+      <h2 className="section-title mb-4 text-neon text-center">Catálogo de Productos</h2>
 
       {/* BUSCADOR */}
       <input
